@@ -544,14 +544,17 @@
     var bl = uid + "_bl", cl = uid + "_cl", gl = uid + "_gl", sh = uid + "_sh", rg = uid + "_rg";
     var mt = uid + "_mt", md = uid + "_md";
 
+    /* 占位符替换为 CSS 变量（带原色 fallback）：
+       默认主题沿用香云纱暖色；换肤时由 body[data-skin] 定义 --ic-* 让图标整体跟随主题变色。
+       注意 recolor()/art 描边也复用这些变量字符串，SVG 内 var() 会被浏览器正确解析。 */
     var raw = def[2]
-      .replace(/\{AL\}/g, acc[0])
-      .replace(/\{AD\}/g, acc[2])
-      .replace(/\{A\}/g, acc[1])
-      .replace(/\{L\}/g, pal[0])
-      .replace(/\{M\}/g, pal[1])
-      .replace(/\{D\}/g, pal[2])
-      .replace(/\{W\}/g, "#FFFCF2");
+      .replace(/\{AL\}/g, "var(--ic-al," + acc[0] + ")")
+      .replace(/\{AD\}/g, "var(--ic-ad," + acc[2] + ")")
+      .replace(/\{A\}/g,  "var(--ic-a,"  + acc[1] + ")")
+      .replace(/\{L\}/g,  "var(--ic-l,"  + pal[0] + ")")
+      .replace(/\{M\}/g,  "var(--ic-m,"  + pal[1] + ")")
+      .replace(/\{D\}/g,  "var(--ic-d,"  + pal[2] + ")")
+      .replace(/\{W\}/g,  "var(--ic-w,#FFFCF2)");
 
     // 只替换实心填充，保留 fill="none" 的线条元素
     function recolor(art, col) {

@@ -7,6 +7,46 @@
 /* ---------------------------------------------------------------- 商店 */
 var ShopTab = "all";
 
+/* 由称号库自动生成商店称号商品：商品 id = "title_" + 称号 id 去掉 "ti_" 前缀。
+   以后新增称号只需改 YS_TITLES，商店自动上架，无需两处维护。 */
+function titleShopItems() {
+  return (typeof YS_TITLES !== "undefined" ? YS_TITLES : []).filter(function (t) {
+    return t.price > 0;
+  }).map(function (t) {
+    return {
+      id: "title_" + t.id.replace(/^ti_/, ""),
+      name: "称号·" + t.name,
+      ico: t.tier >= 4 ? "👑" : t.tier >= 3 ? "🌟" : "🎖️",
+      price: t.price, type: "title", desc: t.desc,
+      tier: t.tier, tid: t.id
+    };
+  });
+}
+/* 由主题库自动生成商店主题商品：只取 price>0 的（默认主题 price=0 不上架）。
+   商品 id 直接沿用 YS_THEMES 的 id，与购买/使用逻辑天然一致。 */
+function themeShopItems() {
+  return (typeof YS_THEMES !== "undefined" ? YS_THEMES : []).filter(function (t) {
+    return t.price > 0 && t.id;
+  }).map(function (t) {
+    return {
+      id: t.id, name: "主题·" + t.name, ico: t.ico || "🎨",
+      price: t.price, type: "theme", skin: t.skin, sw: t.sw, desc: t.desc
+    };
+  });
+}
+/* 全部商品 = 静态商品 + 自动生成的称号商品 + 自动生成的主题商品 */
+function allShopItems() {
+  return (typeof YS_SHOP !== "undefined" ? YS_SHOP : [])
+    .concat(titleShopItems()).concat(themeShopItems());
+}
+/* 商品 id → 称号对象（数据驱动，不再硬编码映射表） */
+function shopTitleOf(it) {
+  if (!it || it.type !== "title") return null;
+  if (it.tid) return (YS_TITLES.filter(function (x) { return x.id === it.tid; })[0]) || null;
+  var tid = "ti_" + String(it.id || "").replace(/^title_/, "");
+  return (YS_TITLES.filter(function (x) { return x.id === tid; })[0]) || null;
+}
+
 function renderShop() {
   var d = Store.data;
   var cats = [
@@ -15,7 +55,7 @@ function renderShop() {
     { k: "theme", label: "主题" },
     { k: "title", label: "称号" }
   ];
-  var list = YS_SHOP.filter(function (it) { return ShopTab === "all" || it.type === ShopTab; });
+  var list = allShopItems().filter(function (it) { return ShopTab === "all" || it.type === ShopTab; });
   var cur = d.equippedTheme || "";
 
   // 主题类：额外提供「茶褐原色」默认主题卡（永远可用，用于恢复原样）
@@ -56,12 +96,15 @@ function renderShop() {
           dis = owned ? "disabled" : "";
           attr = 'data-buy="' + it.id + '"';
         }
+        var shopTitle = shopTitleOf(it);
         var thumb = (isTheme && it.sw)
           ? '<div class="shop-sw" style="background:linear-gradient(135deg,' + it.sw[0] + ',' + it.sw[1] + ')"></div>'
-          : '<div style="font-size:40px;margin-bottom:8px">' + it.ico + '</div>';
+          : shopTitle
+            ? '<div style="font-size:26px;margin:6px 0 10px">' + titleBadgeHTML(shopTitle, { big: true }) + '</div>'
+            : '<div style="font-size:40px;margin-bottom:8px">' + it.ico + '</div>';
         return '<div class="shop-item card" style="text-align:center;margin:0' + (using ? ';box-shadow:0 0 0 2px var(--gold) inset' : '') + '">' +
           thumb +
-          '<b style="font-size:13px;display:block">' + it.name + '</b>' +
+          '<b style="font-size:13px;display:block">' + (shopTitle ? shopTitle.name : it.name) + '</b>' +
           '<div style="font-size:11px;color:var(--ink-3);margin:4px 0 10px">' + it.desc + '</div>' +
           '<button class="btn btn-sm ' + cls + ' btn-block" ' + attr + ' ' + dis + '>' + label + '</button></div>';
       }).join("") +
@@ -90,7 +133,7 @@ function renderShop() {
 
 function buyShopItem(id) {
   var d = Store.data;
-  var it = YS_SHOP.filter(function (x) { return x.id === id; })[0];
+  var it = allShopItems().filter(function (x) { return x.id === id; })[0];
   if (!it) return;
   if ((d.inventory || []).indexOf(id) >= 0) { toast("已拥有该商品", { ico: "✅" }); return; }
   if ((d.user.coins || 0) < it.price) { toast("传承币不足，去完成任务或开盲盒吧", { ico: "😅" }); Sound.fail(); return; }
@@ -99,8 +142,8 @@ function buyShopItem(id) {
   if (it.type === "theme") { d.equippedTheme = id; }
   if (it.type === "decor") { d.avatar = id; d.customAvatar = ""; }
   if (it.type === "title") {
-    var map = { title_master: "ti_master", title_legend: "ti_legend" };
-    var tid = map[id] || "ti_none";
+    var st = shopTitleOf(it);
+    var tid = st ? st.id : "ti_none";
     if (d.ownedTitles.indexOf(tid) < 0) d.ownedTitles.push(tid);
     d.title = tid;
   }
@@ -120,7 +163,7 @@ function buyShopItem(id) {
 function renderThemePicker() {
   var d = Store.data;
   var cur = d.equippedTheme || "";
-  var body = '<div style="font-size:12px;color:var(--ink-3);line-height:1.7;margin-bottom:12px">主题会即时应用整站配色，「泥金」「草绿」需在传承商店购买后解锁。</div>' +
+  var body = '<div style="font-size:12px;color:var(--ink-3);line-height:1.7;margin-bottom:12px">共 ' + YS_THEMES.length + ' 套主题，切换后整站配色与背景会即时改变。带 🔒 的主题需在传承商店购买后解锁。</div>' +
     YS_THEMES.map(function (t) {
       var owned = !t.id || (d.inventory || []).indexOf(t.id) >= 0;
       var on = cur === t.id;
@@ -429,16 +472,25 @@ function renderTitlePicker() {
   var d = Store.data;
   $("#titleBody").innerHTML =
     '<div class="subhead"><button class="back-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><h2>我的称号</h2></div>' +
-    '<div class="card" style="text-align:center;padding:24px">' +
-      '<div style="font-size:12px;color:var(--ink-3)">当前佩戴</div>' +
-      '<div style="font-size:22px;font-weight:800;color:var(--brand-d);margin-top:8px">' + (getTitle().id === "ti_none" ? "未佩戴称号" : getTitle().name) + '</div></div>' +
+    '<div class="card" style="text-align:center;padding:26px 24px;background:linear-gradient(160deg,var(--brand-d),#3A2418)">' +
+      '<div style="font-size:12px;color:rgba(255,255,255,.7)">当前佩戴称号</div>' +
+      '<div style="margin-top:10px;min-height:34px">' +
+        (getTitle().id === "ti_none"
+          ? '<span style="font-size:20px;font-weight:800;color:rgba(255,255,255,.6)">未佩戴称号</span>'
+          : titleBadgeHTML(getTitle(), { big: true, block: true })) +
+      '</div>' +
+      '<div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:8px">' +
+        (getTitle().id === "ti_none" ? '佩戴称号，让身份更闪耀' : '稀有度 · ' + tierName(titleTier(getTitle()))) +
+      '</div></div>' +
     '<div class="card flush">' +
-      YS_TITLES.map(function (t) {
+      YS_TITLES.slice().sort(function (a, b) { return titleTier(b) - titleTier(a); }).map(function (t) {
         var owned = (d.ownedTitles || []).indexOf(t.id) >= 0;
         var wearing = d.title === t.id;
+        var tier = titleTier(t);
         return '<div class="list-row" data-title="' + t.id + '" style="cursor:pointer;padding:14px 18px">' +
           '<div class="lr-ico">🎖️</div>' +
-          '<div class="lr-main"><b>' + t.name + '</b><span>' + t.desc + '</span></div>' +
+          '<div class="lr-main"><b>' + titleBadgeHTML(t) + '</b>' +
+            '<span>' + tierName(tier) + ' · ' + t.desc + '</span></div>' +
           '<span class="tag ' + (wearing ? 'tag-gold' : owned ? 'tag-green' : 'tag-gray') + '">' +
             (wearing ? '佩戴中' : owned ? '佩戴' : '未解锁') + '</span></div>';
       }).join("") +
@@ -463,7 +515,7 @@ function renderTitlePicker() {
 function renderInventory() {
   var d = Store.data;
   var items = (d.inventory || []).map(function (id) {
-    return YS_SHOP.filter(function (x) { return x.id === id; })[0];
+    return allShopItems().filter(function (x) { return x.id === id; })[0];
   }).filter(Boolean);
 
   $("#inventoryBody").innerHTML =
@@ -508,9 +560,9 @@ function openAchDetail(id) {
     sign_30: "累计签到 30 天", first_task: "完成任意一个研学任务", task_all: "完成全部 4 个研学任务",
     perfect_task: "单次任务获得满分", map_all: "打卡全部 4 个研学点位", know_5: "阅读 5 条工艺知识",
     story_1: "阅读一篇非遗故事", quiz_1: "完成一次知识问答", quiz_90: "知识问答超过 90 分",
-    mud_1: "完成一次涂河泥体验", mud_100: "涂河泥完成度达到 100%", rhythm_1: "完成一次煮绸节拍",
-    sort_1: "完成一次工序排序", memory_1: "完成一次翻牌记忆", ue_link: "接收一次 UE 联动事件",
-    cert: "生成研学证书", xp_1000: "累计积分达到 1000", all_games: "玩过全部 5 个小游戏",
+    mud_1: "完成一次晒莨抢晴", mud_100: "晒莨抢晴单局达到 300 分", rhythm_1: "完成一次莨水配比",
+    sort_1: "完成一次工序排序", memory_1: "完成一次翻牌记忆", ue_link: "接收一次数字孪生联动事件",
+    cert: "生成研学证书", xp_1000: "累计积分达到 1000", all_games: "玩过全部 6 个小游戏",
     box_1: "开启第一个盲盒", shop_1: "在商店购买第一件商品", frame_1: "佩戴一个头像框",
     coins_500: "累计获得 500 传承币", share_1: "生成一张研学分享卡", all_done: "解锁全部成就"
   }[id] || "完成对应条件即可解锁";

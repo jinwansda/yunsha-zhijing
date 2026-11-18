@@ -35,7 +35,7 @@ var Map3D = {
       '</div>' +
       '<div class="map3d-hint" style="font-size:12px;color:var(--ink-3);text-align:center;margin-bottom:8px">🖐️ 单指旋转 · 双指缩放 · 拖动平移 · 点击建筑进入点位</div>' +
       '<div id="map3dCanvas" style="position:relative;border-radius:var(--r-xl);overflow:hidden;height:460px;background:linear-gradient(180deg,#87CEEB,#B9CBA4)"></div>' +
-      '<div style="margin-top:12px;font-size:11px;color:var(--ink-3);text-align:center">🔗 本场景为 UE 虚拟引擎数字孪生的轻量预览，完整场景由 UE 组同学通过 /api/ue/events 对接</div>';
+      '<div style="margin-top:12px;font-size:11px;color:var(--ink-3);text-align:center">🔗 本场景为香云纱园区数字孪生的轻量预览，完整场景由现场设备实时联动</div>';
 
     Nav.go("v-map3d", { after: function () {
       $("#map3dBody .back-btn").addEventListener("click", function () { Map3D.destroy(); Nav.back(); });
@@ -52,7 +52,7 @@ var Map3D = {
       container.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--ink-2)">' +
         '<div style="font-size:40px;margin-bottom:10px">🏗️</div>' +
         '<div>3D 引擎加载失败</div>' +
-        '<div style="font-size:12px;color:var(--ink-3);margin-top:6px">请检查网络后重试，或使用 UE 虚拟引擎完整场景</div></div>';
+        '<div style="font-size:12px;color:var(--ink-3);margin-top:6px">请检查网络后重试，或使用数字孪生完整场景</div></div>';
       return;
     }
 

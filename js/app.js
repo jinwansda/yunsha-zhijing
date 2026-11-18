@@ -108,6 +108,7 @@ var Store = {
       user: { name: "", role: "student", school: "", joined: ds(), xp: 0, coins: 0, phone: "" },
       settings: { sound: true, vibrate: true, dark: false, bigFont: false, voice: false, eyeCare: false, checkinRemind: true, notifyTask: true, notifyAch: true, notifyUe: true },
       guideDone: false,
+      homeTourDone: false,
       loggedIn: false,
       checkin: { last: "", streak: 0, total: 0, dates: [] },
       /* 奖励系统 */
@@ -132,7 +133,22 @@ var Store = {
       ueEvents: [],        // UE4 联动记录
       classRoster: [],     // 老师端导入的真实学生记录（不自动生成）
       certGenerated: false,
-      radar: { "工艺认知": 0, "实践操作": 0, "文化理解": 0, "知识掌握": 0, "安全素养": 0 }
+      radar: { "工艺认知": 0, "实践操作": 0, "文化理解": 0, "知识掌握": 0, "安全素养": 0 },
+
+      /* 传承成长体系 */
+      mastersRead: {},        // { master_id: true } 图鉴·匠心传承
+      patternsSeen: {},       // { pattern_id: true } 图鉴·纱品纹样
+      codexSets: {},          // { set_id: true } 已集齐并领奖的套系
+      seasonId: "spring",     // 当前研学季
+      seasonXp: {},           // { season_id: number } 各季研习值
+      seasonClaimed: {},      // { season_id + ':' + tierIndex + ':' + track: true } 已领奖
+      seasonPro: {},          // { season_id: true } 已解锁匠心轨
+      dailyDate: "",          // 每日研习的日期
+      daily: {},              // { task_id: count } 今日进度
+      dailyClaimed: {},       // { task_id: true } 今日已领奖
+      streakMiles: {},        // { days: true } 已领取的连续研习里程碑
+      ownedSkins: [],         // 已拥有的限定皮肤 id
+      equippedSkin: ""        // 当前穿戴的限定皮肤 id（叠加在主题之上）
     };
   },
 
@@ -299,6 +315,11 @@ var Sheet = {
   close: function () {
     $("#sheetMask").classList.remove("show");
     $("#sheet").classList.remove("show");
+    try {
+      $("#sheetTitle").textContent = "";
+      $("#sheetBody").innerHTML = "";
+      var f = $("#sheetFoot"); f.innerHTML = ""; f.style.display = "none";
+    } catch (e) {}
     Sheet.isOpen = false;
   }
 };
@@ -363,6 +384,7 @@ var Nav = {
   stack: [],
   go: function (id, opt) {
     opt = opt || {};
+    if (typeof Sheet !== "undefined") Sheet.close(); /* 切换视图时关闭任何残留底部弹层，避免跨页面残留 */
     var cur = $("#" + Nav.current);
     var next = $("#" + id);
     if (!next) return;
@@ -429,7 +451,11 @@ function applyTheme() {
   var m = document.querySelector('meta[name="theme-color"]');
   if (m) {
     var s = Store.data.settings || {};
-    var colors = { gold: "#A9742B", grass: "#5E7A4B", default: "#83533B" };
+    var colors = {
+      gold: "#A9742B", grass: "#5E7A4B", ocean: "#2E5E96", violet: "#6E4BA8",
+      ink: "#2C4A46", sunset: "#B0432F", celadon: "#3E8078", sakura: "#C25C7E",
+      default: "#83533B"
+    };
     m.setAttribute("content", s.dark ? "#17110C" : (colors[skin] || colors.default));
   }
 }
@@ -498,14 +524,23 @@ async function boot() {
           splash.classList.add("hide");
           setTimeout(function(){ if (splash) splash.remove(); }, 700);
       }
-      
+
+      // 进入主程序前，确保登录卡片已隐藏（已登录用户重进 / 跨页残留时，
+      // #authWrap 默认可见会盖住首页；未登录分支随后由 showAuth() 重新显示）
+      var aw = $("#authWrap");
+      if (aw) aw.classList.add("hide");
+
       // 判断进入登录页还是首页
       try {
-        if (!Store.data.loggedIn) showAuth();
-        else if (!Store.data.guideDone) openGuide();
-        else if (Store.data.user.role === "teacher") Nav.go("v-teacher", { push: false });
-        else Nav.go("v-home", { push: false });
-        unlockAchievement("first_login");
+        if (!Store.data.loggedIn) {
+          // 未登录：先进入登录页；「初入云纱」在登录成功后的 reallyLogin 里按用户档案解锁，避免重复弹窗
+          showAuth();
+        } else {
+          if (!Store.data.guideDone) openGuide();
+          else if (Store.data.user.role === "teacher") Nav.go("v-teacher", { push: false });
+          else Nav.go("v-home", { push: false });
+          unlockAchievement("first_login");
+        }
       } catch (e) {
         console.warn("boot view", e);
         Nav.go("v-home", { push: false });
@@ -711,6 +746,17 @@ function bindGlobalEvents() {
     if (b.classList.contains("quiz-opt") || b.classList.contains("chip")) return;
     b.style.transition = "transform .12s cubic-bezier(.22,.61,.36,1)";
   }, true);
+
+  // 等级徽章：点击任意 Lv.X 打开全部等级面板（事件委托，覆盖所有页面/动态重绘）
+  document.addEventListener("click", function (e) {
+    var lv = e.target.closest('[data-act="levelPanel"]');
+    if (lv) { e.preventDefault(); e.stopPropagation(); try { showLevelPanel(); } catch (err) { console.warn("levelPanel", err); } return; }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    var lv = e.target && e.target.closest && e.target.closest('[data-act="levelPanel"]');
+    if (lv) { e.preventDefault(); try { showLevelPanel(); } catch (err) { console.warn("levelPanel", err); } }
+  });
 }
 
 /* ---------------------------------------------------------------- 成就系统 */
@@ -773,6 +819,9 @@ function doCheckin() {
   Sound.coin();
   confetti(30);
 
+  /* 传承成长：推进今日研习（晒莨签到）与研习值 */
+  if (typeof window.Growth !== "undefined") Growth.onAction("sign");
+
   // 刷新当前页
   if (Nav.current === "v-sign") renderSignCalendar();
   else if (Nav.current === "v-home") renderHome();
@@ -825,6 +874,116 @@ function getTitle() {
   var id = Store.data.title;
   var t = YS_TITLES.filter(function (x) { return x.id === id; })[0];
   return t || YS_TITLES[0];
+}
+
+/* ---------------------------------------------------------------- 等级/称号 炫彩徽章
+   tier 越高特效越炫：0 普通 → 1 精良 → 2 稀有 → 3 史诗 → 4 传说(炫彩流光)
+   所有身份展示统一走这里，保证各页面视觉一致。 */
+
+/* 取称号档位（兼容未定义 tier 的旧数据） */
+function titleTier(t) {
+  if (!t) return 0;
+  if (typeof t.tier === "number") return t.tier;
+  return 0;
+}
+/* 等级徽章：Lv.N，class 带档位；点击弹出全部等级面板（游戏段位式）
+   opts.tag=紧凑标签 / opts.glow=加强光晕 / opts.noClick=不可点(面板内展示用) */
+function levelBadgeHTML(lv, opts) {
+  opts = opts || {};
+  var tier = (typeof titleTierOfLevel === "function") ? titleTierOfLevel(lv) : 0;
+  var cls = "rk rk-lv rank-t" + tier + (opts.tag ? " rk-tag" : "") + (opts.glow ? " rk-glow" : "");
+  if (!opts.noClick) cls += " rk-clickable";
+  var attr = opts.noClick ? "" : ' data-act="levelPanel" role="button" tabindex="0"';
+  /* 高档等级加星辉装饰：史诗✨ / 传说👑 */
+  var deco = !opts.noClick && tier >= 4 ? '<span class="rk-deco">👑</span>' : (!opts.noClick && tier === 3 ? '<span class="rk-deco">✨</span>' : '');
+  var badge = '<span class="' + cls + '"' + attr + ' aria-label="查看全部等级">' + deco + 'Lv.' + lv + '</span>';
+
+  /* 传说档最后三级逐级增强：13 炫彩 / 14 少量随机轨道粒子 / 15 更多随机轨道粒子
+     每颗粒子的半径、周期、方向、大小、色相都不同——像自由飞舞的彩色光点，而非规则圆环 */
+  if (tier >= 4) {
+    var eliteCls = "rk-elite rk-elite-" + lv;
+    var eliteAttr = opts.noClick ? "" : ' data-act="levelPanel" role="button" tabindex="0"';
+    var aura = "";
+    if (lv >= 14) {
+      /* 确定性伪随机参数表：[起始角deg, 半径px, 周期s, 方向(1顺/-1逆), 大小px, 色相] */
+      var ORB = [
+        [12, 30, 5.2, 1, 6, 352], [73, 22, 7.8, -1, 5, 28],
+        [141, 34, 6.1, 1, 7, 52], [198, 19, 9.3, -1, 4, 142],
+        [257, 27, 4.7, 1, 5, 195], [310, 24, 8.4, -1, 6, 268],
+        [46, 32, 5.9, 1, 4, 315], [175, 21, 7.1, -1, 5, 168]
+      ];
+      var count = lv >= 15 ? 8 : 4;
+      var orbs = "";
+      for (var i = 0; i < count; i++) {
+        var o = ORB[i];
+        orbs += '<span class="rk-orb" style="--rot:' + o[2] + 's;--delay:' + (-i * 0.9).toFixed(1) + 's;--dir:' + (o[3] > 0 ? 'normal' : 'reverse') + '" aria-hidden="true">' +
+                  '<span class="rk-dot" style="--a:' + o[0] + 'deg;--r:' + o[1] + 'px;--s:' + o[4] + 'px;--h:' + o[5] + '"></span>' +
+                '</span>';
+      }
+      aura += '<span class="rk-particles" aria-hidden="true">' + orbs + '</span>';
+    }
+    return '<span class="' + eliteCls + '"' + eliteAttr + ' aria-label="查看全部等级">' + aura + badge + '</span>';
+  }
+  return badge;
+}
+/* 称号徽章：文字按稀有度上色，传说档为炫彩流光字 */
+function titleBadgeHTML(title, opts) {
+  opts = opts || {};
+  var t = title || getTitle();
+  var tier = titleTier(t);
+  var name = t && t.name ? t.name : "无称号";
+  var cls = "rk rk-title rank-t" + tier + (opts.block ? " rk-block" : "") + (opts.big ? " rk-big" : "");
+  /* 高档称号加装饰：史诗✨、传说👑+流光，越高级越显赫 */
+  var deco = tier >= 4 ? '<span class="rk-deco">👑</span>' : tier === 3 ? '<span class="rk-deco">✨</span>' : '';
+  return '<span class="' + cls + '">' + deco + esc(name) + '</span>';
+}
+/* 稀有度中文名（用于称号列表标注） */
+function tierName(tier) {
+  return ["普通", "精良", "稀有", "史诗", "传说"][tier] || "普通";
+}
+
+/* 全部等级面板（游戏段位式）：点击任意 Lv.X 徽章打开 */
+function showLevelPanel() {
+  var d = Store.data;
+  var li = levelInfo(d.user.xp);
+  var curLv = li.cur.lv;
+  var xp = d.user.xp;
+
+  /* 顶部当前段位大卡 */
+  var head =
+    '<div class="lvp-hero rank-bg-t' + titleTierOfLevel(curLv) + '">' +
+      '<div class="lvp-hero-crown">' + (curLv >= 13 ? '👑' : curLv >= 10 ? '✨' : '🎖️') + '</div>' +
+      '<div class="lvp-hero-lv">' + levelBadgeHTML(curLv, { glow: true, noClick: true }) + '</div>' +
+      '<div class="lvp-hero-name">' + esc(li.cur.name) + '</div>' +
+      '<div class="lvp-hero-xp">当前 ' + xp + ' 积分' + (li.next ? ' · 距下一级还需 ' + (li.next.xp - xp) + ' 分' : ' · 已达最高等级') + '</div>' +
+      '<div class="lvp-bar"><i style="width:' +
+        (li.next ? Math.max(0, Math.min(100, (xp - li.cur.xp) / (li.next.xp - li.cur.xp) * 100)) : 100) + '%"></i></div>' +
+    '</div>';
+
+  /* 全部等级阶梯（从高到低，像段位表） */
+  var rows = YS_LEVELS.slice().reverse().map(function (L) {
+    var tier = titleTierOfLevel(L.lv);
+    var reached = xp >= L.xp;
+    var isCur = L.lv === curLv;
+    var cls = "lvp-row lvp-t" + tier + (reached ? " reached" : " locked") + (isCur ? " current" : "");
+    var status = isCur ? '<span class="lvp-now">当前</span>'
+      : reached ? '<span class="lvp-ok">✓ 已达成</span>'
+      : '<span class="lvp-lock">' + L.xp + ' 分</span>';
+    return '<div class="' + cls + '">' +
+      '<div class="lvp-badge">' + levelBadgeHTML(L.lv, { tag: true, noClick: true }) + '</div>' +
+      '<div class="lvp-info"><b>' + esc(L.name) + '</b><span>' + tierName(tier) + ' · ' + L.xp + ' 积分</span></div>' +
+      status + '</div>';
+  }).join("");
+
+  Sheet.open({
+    title: "研学等级",
+    body: head +
+      '<div class="lvp-section-title">🏅 全部等级 · 共 ' + YS_LEVELS.length + ' 级</div>' +
+      '<div class="lvp-list">' + rows + '</div>' +
+      '<div class="lvp-tip">完成任务、玩游戏、每日签到都能获得积分，等级越高徽章越炫彩！</div>',
+    foot: '<button class="btn btn-primary btn-block" id="lvpClose">继续研学</button>',
+    onMount: function () { var b = $("#lvpClose"); if (b) b.onclick = Sheet.close; }
+  });
 }
 function avatarDisplayHTML(size) {
   var s = size || 54;

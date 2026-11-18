@@ -69,7 +69,7 @@
         { ico: "ai",    name: "AI 问答", sub: "大模型 RAG", act: "ai" },
         { ico: "scan",  name: "扫码打卡", sub: "点位签到", act: "scan" },
         { ico: "cert",  name: "研学证书", sub: "完成4项解锁", act: "cert" },
-        { ico: "ue",    name: "UE 联动", sub: "数字孪生", act: "ue" }
+        { ico: "ue",    name: "数字孪生联动", sub: "虚实结合", act: "ue" }
       ]
     },
     {
@@ -204,8 +204,9 @@
       '<div class="s3d-userbar" style="display:flex;align-items:center;gap:8px;margin:-2px 2px 12px">' +
         '<span style="width:30px;height:30px;display:inline-flex">' + svg("me") + '</span>' +
         '<b style="font-size:13px">' + esc(name) + '</b>' +
-        '<span style="font-size:11px;color:var(--ink-3)">Lv.' + li.cur.lv + ' · ' + li.cur.name + '</span>' +
-        '<span style="margin-left:auto;font-size:11px;font-weight:800;color:var(--amber);display:inline-flex;align-items:center;gap:3px">' + (typeof Icon3D!=="undefined"?Icon3D.box("coin",15):"🪙") + ' ' + (d.user.coins || 0) + ' · ' + (typeof Icon3D!=="undefined"?Icon3D.box("ach",15):"✨") + ' ' + d.user.xp + '</span>' +
+        (typeof levelBadgeHTML === "function" ? levelBadgeHTML(li.cur.lv, { tag: true }) : '<span style="font-size:11px;color:var(--ink-3)">Lv.' + li.cur.lv + '</span>') +
+        (typeof titleBadgeHTML === "function" && getTitle().id !== "ti_none" ? titleBadgeHTML(getTitle()) : '') +
+        '<span style="margin-left:auto;font-size:11px;font-weight:800;color:var(--amber);display:inline-flex;align-items:center;gap:3px">' + (typeof Icon3D!=="undefined"?Icon3D.box("coin",15):"🪙") + ' ' + (d.user.coins || 0) + ' 传承币 · ' + (typeof Icon3D!=="undefined"?Icon3D.box("ach",15):"✨") + ' ' + d.user.xp + ' 积分</span>' +
       '</div>' +
 
       /* 大 Banner（自动轮播：图片 + 活动，逐张滑入） */
@@ -292,7 +293,11 @@
 
       /* 研学历程 */
       '<div class="s3d-progress">' +
-        '<div class="p-head"><b>✨ 我的研学历程</b><span>Lv.' + li.cur.lv + ' · ' + li.cur.name + '</span></div>' +
+        '<div class="p-head"><b>✨ 我的研学历程</b>' +
+          '<span style="display:inline-flex;align-items:center;gap:6px">' +
+            (typeof levelBadgeHTML === "function" ? levelBadgeHTML(li.cur.lv, { tag: true }) : '<span>Lv.' + li.cur.lv + '</span>') +
+            (typeof titleBadgeHTML === "function" && getTitle().id !== "ti_none" ? titleBadgeHTML(getTitle()) : '') +
+          '</span></div>' +
         '<div class="pbar"><i style="width:' + xpPct + '%"></i></div>' +
         '<div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-3);margin-top:7px">' +
           '<span>' + d.user.xp + ' 积分</span><span>' + (li.next ? "距 " + li.next.name + " 还需 " + (nextXp - d.user.xp) + " 分" : "已满级") + '</span></div>' +
@@ -540,6 +545,11 @@
     /* 主动升级本页 3D 图标 */
     if (typeof global.Icon3D !== "undefined") {
       try { global.Icon3D.upgrade(host); } catch (e) {}
+    }
+
+    /* 新用户：自动开启首页玩法指引（仅首次，之后可在设置里重看） */
+    if (typeof global.HomeTour !== "undefined") {
+      try { global.HomeTour.maybe(); } catch (e) { console.warn("homeTour", e); }
     }
   }
 

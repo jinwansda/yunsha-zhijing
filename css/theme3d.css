@@ -100,17 +100,21 @@ body {
   opacity: 0;
   transform: scale(1.12);
   animation: bgKenBurns 28s ease-in-out infinite;
-  filter: saturate(.82) brightness(1.04);
+  /* 主题换肤：照片滤镜随主题微调色相/饱和度，让大背景也跟着变 */
+  filter: var(--photo-filter, saturate(.82) brightness(1.04));
+  transition: filter .4s var(--ease);
 }
 .app-bg .bg-photo:nth-child(1) { animation-delay: 0s; }
 .app-bg .bg-photo:nth-child(2) { animation-delay: 7s; }
 .app-bg .bg-photo:nth-child(3) { animation-delay: 14s; }
 .app-bg .bg-photo:nth-child(4) { animation-delay: 21s; }
+/* 主题换肤：整屏蒙版颜色随主题变化（占屏面积最大，切换差异最明显） */
 .app-bg .bg-veil {
   position: absolute; inset: 0;
   background:
-    linear-gradient(180deg, rgba(246,240,230,.82) 0%, rgba(246,240,230,.62) 38%, rgba(246,240,230,.78) 100%),
-    radial-gradient(120% 60% at 50% 0%, rgba(131,83,59,.10), transparent 60%);
+    linear-gradient(180deg, var(--veil-1, rgba(246,240,230,.82)) 0%, var(--veil-2, rgba(246,240,230,.62)) 38%, var(--veil-3, rgba(246,240,230,.78)) 100%),
+    radial-gradient(120% 60% at 50% 0%, var(--veil-glow, rgba(131,83,59,.10)), transparent 60%);
+  transition: background .4s var(--ease);
 }
 @keyframes bgKenBurns {
   0%   { opacity: 0; transform: scale(1.18) translateY(0); }
@@ -125,7 +129,9 @@ body {
   background: rgba(28,18,13,.0);
 }
 body[data-theme="dark"] .app-bg .bg-veil {
-  background: linear-gradient(180deg, rgba(23,17,12,.86), rgba(23,17,12,.7) 38%, rgba(23,17,12,.82));
+  background:
+    linear-gradient(180deg, var(--veil-d1, rgba(23,17,12,.86)), var(--veil-d2, rgba(23,17,12,.7)) 38%, var(--veil-d3, rgba(23,17,12,.82))),
+    radial-gradient(120% 60% at 50% 0%, var(--veil-glow, rgba(131,83,59,.10)), transparent 60%);
 }
 
 /* ---------------------------------------------------------------- 2. 状态栏 / 导航 */
@@ -420,7 +426,8 @@ body[data-theme="dark"] #tabbar { background: var(--card) !important; }
 
 /* 分组卡片 + 3D 图标网格 */
 .s3d-section {
-  background: #FFFFFF; border: 1px solid var(--line); border-radius: var(--r-xl);
+  /* 用带主题色调的 card-2，让奖励中心等内页背景版跟随主题（而非纯白 card） */
+  background: var(--card-2); border: 1px solid var(--line); border-radius: var(--r-xl);
   box-shadow: var(--sh-1); padding: 14px 10px 8px; margin-bottom: 14px;
 }
 .s3d-sec-head { display: flex; align-items: center; padding: 0 6px 12px; }

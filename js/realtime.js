@@ -24,10 +24,10 @@ var Realtime = {
       self.mount();
     });
     API.on("ack", function (m) {
-      toast("UE 已响应：" + (m.ok ? "操作成功" : "操作失败"), { ico: m.ok ? "✅" : "⚠️" });
+      toast("联动已响应：" + (m.ok ? "操作成功" : "操作失败"), { ico: m.ok ? "✅" : "⚠️" });
     });
     API.on("command_sent", function (m) {
-      toast("指令已下发至虚拟引擎：" + m.action, { ico: "📡" });
+      toast("指令已下发至数字孪生场景：" + m.action, { ico: "📡" });
     });
 
     // 视图切换后重新挂载实时卡片
@@ -76,7 +76,7 @@ var Realtime = {
           '<span style="width:34px;height:34px;display:inline-flex">' + (typeof Icon3D!=="undefined"?Icon3D.box("signal",34):"📡") + '</span>' +
           '<div style="flex:1"><b style="font-size:14px">数字孪生实时通道</b>' +
           '<div style="font-size:11.5px;color:var(--ink-3);margin-top:3px">' +
-            (ws ? 'WebSocket 已连接，等待 UE 虚拟引擎上报环境参数…' : '未连接后端，使用离线模拟数据') + '</div></div>' +
+            (ws ? '数字孪生通道已连接，环境数据实时同步中…' : '未连接后端，使用离线模拟数据') + '</div></div>' +
         '</div>' +
         '<div style="display:flex;gap:8px;margin-top:12px">' +
           '<button class="btn btn-sm btn-soft" id="rtCmdStart" style="flex:1">' + (typeof Icon3D!=="undefined"?Icon3D.box("play",16):"▶") + ' 开始晒莨</button>' +
@@ -93,8 +93,8 @@ var Realtime = {
 
     return '<div class="card" style="background:linear-gradient(135deg,' +
       (rain ? 'var(--blue-soft)' : 'var(--green-soft)') + ',var(--card));border:none">' +
-      '<div class="card-title"><span class="ct-left">' + (typeof Icon3D!=="undefined"?Icon3D.box("signal",18):"📡") + ' UE 实时环境 · 数字孪生</span>' +
-        '<span class="tag ' + (onlineUE ? 'tag-green' : 'tag-gray') + '">' + (onlineUE ? 'UE 在线' : '演示数据') + '</span></div>' +
+      '<div class="card-title"><span class="ct-left">' + (typeof Icon3D!=="undefined"?Icon3D.box("signal",18):"📡") + ' 实时环境 · 数字孪生</span>' +
+        '<span class="tag ' + (onlineUE ? 'tag-green' : 'tag-gray') + '">' + (onlineUE ? '已联动' : '演示数据') + '</span></div>' +
       '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">' +
         this.metric("☀️", "光照", lux + " lx") +
         this.metric("💧", "湿度", hum + " %") +
@@ -110,7 +110,7 @@ var Realtime = {
         '<button class="btn btn-sm btn-ghost" id="rtCmdRain" style="flex:1">🌧 模拟降雨</button>' +
         '<button class="btn btn-sm btn-ghost" id="rtCmdReset" style="flex:1">☀ 放晴</button>' +
       '</div>' +
-      '<div style="font-size:10px;color:var(--ink-3);margin-top:8px">数据来自 UE 场景遥测帧 · 已联动生成情境题</div>' +
+      '<div style="font-size:10px;color:var(--ink-3);margin-top:8px">数据来自数字孪生场景遥测 · 已联动生成情境题</div>' +
     '</div>';
   },
 
@@ -138,7 +138,7 @@ var Realtime = {
     if (!fit.ok) {
       return {
         id: "RT_QUESTION", title: "实时情境题 · 天时判断", score: 20,
-        question: "UE 场景实时上报：" + (d.rain ? "正在降雨" : "光照 " + Math.round(d.lux || 0) + " lx、湿度 " + Math.round(d.humidity || 0) + "%") +
+        question: "数字孪生场景实时上报：" + (d.rain ? "正在降雨" : "光照 " + Math.round(d.lux || 0) + " lx、湿度 " + Math.round(d.humidity || 0) + "%") +
           "。作为晒场工匠，此时最合理的操作是？",
         options: [
           { id: "A", text: "继续平铺摊晒，靠自然风干即可" },
@@ -151,7 +151,7 @@ var Realtime = {
     }
     return {
       id: "RT_QUESTION", title: "实时情境题 · 天时判断", score: 20,
-      question: "UE 场景实时上报：光照 " + Math.round(d.lux || 0) + " lx、湿度 " + Math.round(d.humidity || 0) +
+      question: "数字孪生场景实时上报：光照 " + Math.round(d.lux || 0) + " lx、湿度 " + Math.round(d.humidity || 0) +
         "%，天气晴好。晒莨工序的正确做法是？",
       options: [
         { id: "A", text: "直接平铺草地、拉直绷紧并固定防风" },
@@ -207,7 +207,7 @@ var Realtime = {
       else if (t.id === "rtStartQuestion") {
         var q = self.dynamicQuestion();
         if (q && typeof QuizFlow !== "undefined") QuizFlow.start(q);
-        else toast("等待 UE 上报环境参数后生成情境题", { ico: "⏳" });
+        else toast("等待实时环境数据后生成情境题", { ico: "⏳" });
       }
     });
   }

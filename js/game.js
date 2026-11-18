@@ -26,7 +26,7 @@ var GameHub = {
       '<div class="game-hero">' +
         '<div class="gh-tag">PLAY & LEARN</div>' +
         '<h3>边玩边学，<br>成为香云纱小达人</h3>' +
-        '<p>五个游戏都能赚积分，成绩全部来自你的真实操作。</p>' +
+        '<p>六个游戏都能赚积分，成绩全部来自你的真实操作。</p>' +
       '</div>' +
 
       '<button class="game-card" data-game="quiz">' +
@@ -246,6 +246,8 @@ var QuizGame = {
     if (d.games.quiz.length > 50) d.games.quiz.shift();
     Store.save();
     renderStatus();
+    /* 传承成长：推进今日研习（答一组研学题） */
+    if (typeof window.Growth !== "undefined") Growth.track("quiz");
     unlockAchievement("quiz_1");
     if (this.score >= 90) unlockAchievement("quiz_90");
     GameHub.checkAllGames();
@@ -889,6 +891,11 @@ var MemoryGame = {
 var LaneGame = {
   score: 0, combo: 0, hits: 0, miss: 0, running: false,
   time: 30, notes: [], timers: [], raf: null, spawnId: null,
+  /* 判定几何：舞台高 340，判定线 bottom:56 → 线中心 y≈282；
+     音符 top:-40 + translateY(y) + 半高20 → 中心 y-20；故音符到线需 y≈302。
+     命中规则：点对该轨道、且音符仍在场上即命中（休闲玩法，不苛求精准时机）；
+     越接近判定线(HIT_Y)得分越高；只有该轨道此刻没有音符(乱按)才算错。 */
+  HIT_Y: 302, HIT_MIN_Y: -45, MISS_Y: 358,
 
   start: function () {
     this.score = 0; this.combo = 0; this.hits = 0; this.miss = 0;
@@ -954,8 +961,8 @@ var LaneGame = {
       var dt = (performance.now() - t0) / 1000;
       note.y = -40 + dt * 170; // 下落速度 170px/s
       note.el.style.transform = "translateY(" + note.y + "px)";
-      // 判定线约在 340-56-40 = 244px 处
-      if (note.y > 250) {
+      // 音符越过判定线（线中心 y≈282，音符中心 y-20）后才算错过，避免"没到线就消失"
+      if (note.y > self.MISS_Y) {
         note.hit = true;
         if (note.el.parentNode) note.el.remove();
         self.combo = 0; self.miss++;
@@ -969,21 +976,25 @@ var LaneGame = {
 
   hit: function (lane) {
     if (!this.running) return;
-    // 找该轨道最靠近判定线的音符
+    var self = this;
+    // 找该轨道仍在场上、且最靠近判定线的音符
     var best = null, bestDist = 1e9;
     this.notes.forEach(function (n) {
       if (n.hit || n.lane !== lane) return;
-      var d = Math.abs(n.y - 230);
+      if (n.y < self.HIT_MIN_Y || n.y > self.MISS_Y) return; // 还没出现/已越过判定线
+      var d = Math.abs(n.y - self.HIT_Y);
       if (d < bestDist) { bestDist = d; best = n; }
     });
-    if (best && bestDist < 70) {
+    if (best) {
+      // 点对图标即命中；越接近判定线分越高（精准 150，普通 100）
+      var base = bestDist <= 45 ? 150 : 100;
       best.hit = true;
       if (best.el.parentNode) best.el.remove();
       this.combo++; this.hits++;
-      this.score += 100 + this.combo * 10;
+      this.score += base + this.combo * 10;
       Sound.rep();
       vibrate(8);
-      this.flashLane("✓", "var(--green)");
+      this.flashLane(bestDist <= 45 ? "完美!" : "✓", "var(--green)");
     } else {
       this.combo = 0; this.miss++;
       Sound.fail();
@@ -1054,5 +1065,5 @@ var LaneGame = {
   }
 };
 
-/* 供首页 Banner「去涂河泥」深链直达 */
+/* 供首页 Banner「去晒莨抢晴」深链直达 */
 window.MudGameStart = function () { try { MudGame.start(); } catch (e) { console.warn("MudGameStart", e); } };

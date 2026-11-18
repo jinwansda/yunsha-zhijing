@@ -80,11 +80,11 @@ function renderHome() {
     '<div class="dual-entry">' +
       '<button class="de-item" id="homeGameBtn">' +
         '<span class="de-ico">🎮</span>' +
-        '<span class="de-txt"><b>游戏中心</b><i>问答 · 涂泥 · 节拍 · 排序 · 记忆</i></span>' +
+        '<span class="de-txt"><b>游戏中心</b><i>问答 · 晒莨抢晴 · 莨水配比 · 排序 · 记忆 · 节奏</i></span>' +
       '</button>' +
       '<button class="de-item" id="homeUeBtn">' +
         '<span class="de-ico">🔗</span>' +
-        '<span class="de-txt"><b>UE 虚实联动</b><i>虚拟引擎数据</i></span>' +
+        '<span class="de-txt"><b>数字孪生联动</b><i>虚实结合体验</i></span>' +
       '</button>' +
     '</div>' +
 
@@ -105,7 +105,7 @@ function renderHome() {
     '</div>' +
 
     '<div class="card">' +
-      '<div class="card-title"><span class="ct-left">✨ 我的研学历程</span><span class="ct-right">Lv.' + li.cur.lv + ' · ' + li.cur.name + '</span></div>' +
+      '<div class="card-title"><span class="ct-left">✨ 我的研学历程</span><span class="ct-right" style="display:inline-flex;align-items:center;gap:6px">' + levelBadgeHTML(li.cur.lv, { tag: true }) + (getTitle().id !== "ti_none" ? titleBadgeHTML(getTitle()) : '') + '</span></div>' +
       '<div class="pbar gold"><i style="width:' + xpPct + '%"></i></div>' +
       '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-top:8px">' +
         '<span>' + d.user.xp + ' 积分</span><span>' + (li.next ? '距离 ' + li.next.name + ' 还需 ' + (nextXp - d.user.xp) + ' 分' : '已满级') + '</span>' +
@@ -156,6 +156,12 @@ function quickDress(ico, label, key) {
   return '<button class="quick-dress" data-dress="' + key + '" style="background:var(--card);border:1px solid var(--line-2);border-radius:16px;padding:14px 4px;box-shadow:var(--sh-1);text-align:center">' +
     '<div style="font-size:26px">' + ico + '</div>' +
     '<div style="font-size:12px;font-weight:700;margin-top:6px">' + label + '</div></button>';
+}
+function growthEntry(ico, label, key, sub) {
+  return '<button class="growth-entry" data-growth="' + key + '" style="background:linear-gradient(160deg,var(--brand-soft),var(--card));border:1px solid var(--line-2);border-radius:16px;padding:12px 4px;box-shadow:var(--sh-1);text-align:center">' +
+    '<div style="font-size:24px">' + ico + '</div>' +
+    '<div style="font-size:11.5px;font-weight:750;margin-top:5px">' + label + '</div>' +
+    '<div style="font-size:9.5px;color:var(--brand);font-weight:700;margin-top:2px">' + esc(sub || "") + '</div></button>';
 }
 
 function gridEntry(ico, title, sub, nav) {
@@ -366,7 +372,7 @@ function renderRoute() {
       desc: "在精华路线基础上，重点完成四项研学任务与互动实践，深度理解「三蒸九煮十八晒」。",
       stops: [
         { id: "HALL", name: "莨珠记主馆", sub: "完成：认识研学主馆" },
-        { id: "WORKSHOP", name: "染整工作坊", sub: "完成：认识工作坊 + 涂泥实践" },
+        { id: "WORKSHOP", name: "染整工作坊", sub: "完成：认识工作坊 + 晒莨实践" },
         { id: "DRYING_FIELD", name: "草地晒莨场", sub: "完成：观察草地晒场" },
         { id: "RIVER", name: "河涌泥料区", sub: "完成：认识河涌与泥料" }
       ] }
@@ -469,6 +475,8 @@ function openPoint(id) {
         renderStatus();
         Sound.coin();
         confetti(20);
+        /* 传承成长：点亮「寻纱足迹」图鉴 + 推进今日研习 */
+        if (typeof window.Growth !== "undefined") Growth.onAction("point", p.id);
         toast("打卡成功！+10 积分", { ico: "📍" });
       }
       $("#pointDoneBtn").disabled = true;
@@ -813,6 +821,8 @@ function openKnowDetail(id) {
   if (!k) return;
   Store.data.knowRead[k.id] = true;
   Store.save();
+  /* 传承成长：点亮「工序密码」图鉴 + 推进今日研习 */
+  if (typeof window.Growth !== "undefined") Growth.onAction("read", k.id);
   var readCount = Object.keys(Store.data.knowRead).length;
   if (readCount >= 5) unlockAchievement("know_5");
 
@@ -930,6 +940,8 @@ function renderMasters() {
 function openMaster(id) {
   var m = YS_MASTERS.filter(function (x) { return x.id === id; })[0];
   if (!m) return;
+  /* 传承成长：点亮「匠心传承」图鉴 + 推进今日研习 */
+  if (typeof window.Growth !== "undefined") Growth.onAction("master", id);
   var gallery = (m.gallery || []).map(function (src) {
     return '<img src="' + src + '" style="width:100%;height:80px;object-fit:cover;border-radius:12px" alt="工艺实景">';
   }).join("");
@@ -1086,8 +1098,9 @@ function renderMe() {
       '<div class="ph-top">' +
         avatarDisplayHTML(62) +
         '<div class="ph-info">' +
-          '<div class="ph-name">' + esc(d.user.name || "研学学员") + '<span class="ph-lvl">Lv.' + li.cur.lv + '</span></div>' +
-          '<div class="ph-title">' + li.cur.name + (getTitle().id !== "ti_none" ? ' · ' + getTitle().name : '') + '</div>' +
+          '<div class="ph-name">' + esc(d.user.name || "研学学员") + levelBadgeHTML(li.cur.lv, { tag: true, glow: true }) + '</div>' +
+          '<div class="ph-title">' + titleBadgeHTML(getTitle(), { big: titleTier(getTitle()) >= 3 }) +
+            '<span style="opacity:.7;margin-left:6px">' + li.cur.name + '</span></div>' +
           '<div style="font-size:11px;color:var(--gold);margin-top:4px">🪙 ' + (d.user.coins || 0) + ' 传承币</div>' +
         '</div>' +
       '</div>' +
@@ -1112,6 +1125,16 @@ function renderMe() {
       quickDress("🗃️", "收藏", "inventory") +
     '</div>' +
 
+    /* 传承成长体系入口（香云纱语境的游戏化机制） */
+    '<div class="card-title" style="padding:2px 2px 12px"><span class="ct-left">🌾 传承成长</span>' +
+      '<span class="ct-right" style="color:var(--ink-3)">边学边藏 · 日积月累</span></div>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">' +
+      growthEntry("📖", "传承图鉴", "codex", (function(){var g=0,t=0;(typeof YS_CODEX!=="undefined"?YS_CODEX:[]).forEach(function(s){var p=(typeof Growth!=="undefined")?Growth.setProgress(s):{got:0,total:s.cards.length};g+=p.got;t+=p.total;});return g+"/"+t;})()) +
+      growthEntry("🎖️", "研学季", "season", (typeof Growth!=="undefined" ? (Growth.seasonName ? Growth.seasonName() : "春染季") : "春染季")) +
+      growthEntry("☀️", "晒莨历", "daily", d.checkin.streak + "天") +
+      growthEntry("✨", "限定皮肤", "skins", ((d.ownedSkins||[]).length) + "/" + (typeof YS_SKINS!=="undefined"?YS_SKINS.length:0)) +
+    '</div>' +
+
     '<div class="card">' +
       '<div class="card-title"><span class="ct-left">📊 学习报告</span><span class="ct-right">' + tasksCompleted() + '/' + YS_TASKS.length + ' 任务</span></div>' +
       '<div class="radar-box"><div class="radar-svg" id="radarSvg"></div></div>' +
@@ -1134,8 +1157,8 @@ function renderMe() {
     '</div>' +
 
     '<div class="dual-entry">' +
-      '<button class="de-item" id="meGameBtn"><span class="de-ico">🎮</span><span class="de-txt"><b>游戏中心</b><i>5 个小游戏</i></span></button>' +
-      '<button class="de-item" id="meUeBtn"><span class="de-ico">🔗</span><span class="de-txt"><b>UE 联动</b><i>虚实结合</i></span></button>' +
+      '<button class="de-item" id="meGameBtn"><span class="de-ico">🎮</span><span class="de-txt"><b>游戏中心</b><i>6 个小游戏</i></span></button>' +
+      '<button class="de-item" id="meUeBtn"><span class="de-ico">🔗</span><span class="de-txt"><b>数字孪生联动</b><i>虚实结合</i></span></button>' +
     '</div>' +
     '<div class="dual-entry">' +
       '<button class="de-item" id="meShopBtn"><span class="de-ico">🛒</span><span class="de-txt"><b>传承商店</b><i>装扮与称号</i></span></button>' +
@@ -1165,6 +1188,14 @@ function renderMe() {
       var fn = window[names[q.dataset.dress]];
       if (typeof fn === "function") fn();
       else toast("该功能正在加载，请稍后重试", { ico: "⏳" });
+    });
+  });
+  $$("#meBody .growth-entry").forEach(function (g) {
+    g.addEventListener("click", function () {
+      var map = { codex: "renderCodex", season: "renderSeason", daily: "renderDaily", skins: "renderSkins" };
+      var fn = (typeof Growth !== "undefined") && window.Growth[map[g.dataset.growth]];
+      if (typeof fn === "function") fn();
+      else toast("该功能加载中", { ico: "⏳" });
     });
   });
   $$("#meBody .badge-item").forEach(function (b) {
@@ -1266,10 +1297,10 @@ function openReport() {
           '<div class="lr-main"><b>' + t.title + '</b><span>' + (isDone ? d.taskScores[t.id] + ' 分' : '未完成') + '</span></div></div>';
       }).join("") +
     '</div>' +
-    '<div class="card"><div class="card-title"><span class="ct-left">🔗 UE 虚实联动记录</span></div>' +
+    '<div class="card"><div class="card-title"><span class="ct-left">🔗 数字孪生联动记录</span></div>' +
       (d.ueEvents.length ? d.ueEvents.map(function (e) {
         return '<div class="list-row"><div class="lr-ico">🔗</div><div class="lr-main"><b>' + e.task_id + '</b><span>' + e.operation_result + ' · ' + e.time + '</span></div></div>';
-      }).join("") : '<div class="empty" style="padding:16px"><div class="d">暂无记录 · 本功能需接入 UE 虚实引擎（教学端）后生效</div></div>') +
+      }).join("") : '<div class="empty" style="padding:16px"><div class="d">暂无记录 · 本功能需接入现场设备后生效</div></div>') +
     '</div>' +
 
     '<div class="card"><div class="card-title"><span class="ct-left">🏆 研学积分排名</span><span class="ct-right" id="lbMyRank"></span></div>' +
@@ -1339,7 +1370,7 @@ function openCert() {
       '<div class="cc-name">' + esc(d.user.name || "研学学员") + '</div>' +
       '<div class="cc-desc">完成了「' + YS_COURSE.name + '」全部研学任务，<br>深入学习了香云纱「三蒸九煮十八晒」非遗技艺。</div>' +
       '<div style="display:flex;justify-content:space-around;margin-top:14px;font-size:12px;color:var(--ink-2)">' +
-        '<span>积分 ' + Store.roundNum(d.user.xp) + '</span><span>成就 ' + Object.keys(d.achievements).length + ' 项</span><span>等级 Lv.' + levelInfo(d.user.xp).cur.lv + '</span>' +
+        '<span>积分 ' + Store.roundNum(d.user.xp) + '</span><span>成就 ' + Object.keys(d.achievements).length + ' 项</span><span>等级 ' + levelBadgeHTML(levelInfo(d.user.xp).cur.lv, { tag: true }) + '</span>' +
       '</div>' +
       '<div class="cc-meta">颁发日期 ' + dateStr + ' · 莨珠记研学基地</div>' +
     '</div></div>' +
@@ -1366,7 +1397,7 @@ function renderSettings() {
       '<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">' +
         avatarDisplayHTML(56) +
         '<div><b style="font-size:16px">' + esc(d.user.name || "研学学员") + '</b>' +
-        '<div style="font-size:12px;color:var(--ink-3);margin-top:3px">' + levelInfo(d.user.xp).cur.name + (getTitle().id !== "ti_none" ? ' · ' + getTitle().name : '') + '</div></div>' +
+        '<div style="font-size:12px;color:var(--ink-3);margin-top:3px;display:flex;align-items:center;gap:6px">' + levelBadgeHTML(levelInfo(d.user.xp).cur.lv, { tag: true }) + titleBadgeHTML(getTitle()) + '</div></div>' +
       '</div>' +
       '<div class="list-row"><div class="lr-ico">🏫</div><div class="lr-main"><b>' + (d.user.school || "未填写") + '</b><span>学校 / 班级</span></div></div>' +
       '<div class="list-row"><div class="lr-ico">🎭</div><div class="lr-main"><b>' + (d.user.role === "teacher" ? "指导老师" : "研学学员") + '</b><span>身份角色</span></div></div>' +
@@ -1407,7 +1438,7 @@ function renderSettings() {
     '<div class="card"><div class="card-title"><span class="ct-left">🔔 通知管理</span></div>' +
       toggleRow("📢", "任务提醒", "新任务与任务截止提醒", "notifyTask", s.notifyTask) +
       toggleRow("🏆", "成就通知", "解锁成就时弹窗提醒", "notifyAch", s.notifyAch) +
-      toggleRow("🔗", "UE 联动通知", "虚拟引擎事件实时推送", "notifyUe", s.notifyUe) +
+      toggleRow("🔗", "数字孪生通知", "实况事件实时推送", "notifyUe", s.notifyUe) +
     '</div>' +
 
     // 数据与存储
@@ -1417,9 +1448,14 @@ function renderSettings() {
       '<div class="list-row" id="setResetData"><div class="lr-ico">🗑️</div><div class="lr-main"><b style="color:var(--red)">重置所有数据</b><span>清空学习进度与成就</span></div><span class="lr-arrow">›</span></div>' +
     '</div>' +
 
+    // 通用
+    '<div class="card"><div class="card-title"><span class="ct-left">🧭 通用</span></div>' +
+      '<div class="list-row" id="setTourRow"><div class="lr-ico">🧭</div><div class="lr-main"><b>玩法指引</b><span>重看首页分步操作引导</span></div><span class="lr-arrow">›</span></div>' +
+    '</div>' +
+
     // 后端与联动
     '<div class="card"><div class="card-title"><span class="ct-left">🔗 后端与联动</span></div>' +
-      '<div class="list-row" id="setUeRow"><div class="lr-ico">🔗</div><div class="lr-main"><b>UE 虚实联动</b><span>查看 UE4 虚拟引擎对接状态</span></div><span class="lr-arrow">›</span></div>' +
+      '<div class="list-row" id="setUeRow"><div class="lr-ico">🔗</div><div class="lr-main"><b>数字孪生联动</b><span>查看实时联动状态</span></div><span class="lr-arrow">›</span></div>' +
       '<div class="list-row" id="setApiRow"><div class="lr-ico">🌐</div><div class="lr-main"><b>后端服务</b><span>' + (API.online ? '已连接在线后端' : '离线本地模式') + '</span></div><span class="tag ' + (API.online ? 'tag-green' : 'tag-gray') + '">' + (API.online ? '在线' : '离线') + '</span></div>' +
       '<div class="list-row" id="setMapRow"><div class="lr-ico">🗺️</div><div class="lr-main"><b>地图服务</b><span>OpenStreetMap · 开源地图</span></div><span class="tag tag-blue">已启用</span></div>' +
     '</div>' +
@@ -1610,7 +1646,7 @@ function renderSettings() {
           '<b>常见问题</b><br>' +
           '· 如何完成研学任务？前往「研学任务」页答题闯关<br>' +
           '· 如何生成证书？完成全部 4 个任务后在「我的学习」生成<br>' +
-          '· 如何对接 UE？前往「UE 虚实联动」页查看会话编号<br><br>' +
+          '· 如何对接？前往「数字孪生联动」页查看会话编号<br><br>' +
           '<b>意见反馈</b><br>如有问题请联系竞赛小组指导老师。' +
           '</div>',
         foot: '<button class="btn btn-primary btn-block" id="helpOk">知道了</button>',
@@ -1627,7 +1663,7 @@ function renderSettings() {
           '<div style="font-size:12px;color:var(--ink-3);margin-top:4px">香云纱非遗数字研学平台 v1.2.0</div>' +
           '<div style="font-size:12px;color:var(--ink-2);margin-top:14px;line-height:1.9">' +
           '非遗传承 · 数字体验 · 工匠育人<br>' +
-          '由职中竞赛小组 + 代码组 + UE 虚拟引擎组共建' +
+          '由职中竞赛小组 + 代码组 + 数字孪生技术组共建' +
           '</div></div>',
         foot: '<button class="btn btn-primary btn-block" id="aboutOk">关闭</button>',
         onMount: function () { $("#aboutOk").onclick = Sheet.close; }
@@ -1636,6 +1672,13 @@ function renderSettings() {
     // 检查更新
     $("#setUpdateRow").addEventListener("click", function () {
       toast("已是最新版本 v1.2.0", { ico: "✅" });
+    });
+    // 玩法指引：回首页重看分步引导
+    $("#setTourRow").addEventListener("click", function () {
+      Nav.go("v-home");
+      setTimeout(function () {
+        if (typeof HomeTour !== "undefined") HomeTour.start(true);
+      }, 420);
     });
     // 后端/UE/地图
     $("#setUeRow").addEventListener("click", openUePanel);
@@ -1674,24 +1717,24 @@ function toggleRow(ico, title, sub, key, on) {
 function openUePanel() {
   var d = Store.data;
   $("#ueBody").innerHTML =
-    '<div class="subhead"><button class="back-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><h2>UE 虚实联动</h2></div>' +
+    '<div class="subhead"><button class="back-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><h2>数字孪生联动</h2></div>' +
     '<div class="card" style="text-align:center;background:linear-gradient(160deg,#4C7A78,#35524F);border:none;color:#fff">' +
       '<div style="font-size:40px">🔗</div>' +
       '<div style="font-size:16px;font-weight:800;margin-top:8px">香云纱数字孪生联动</div>' +
-      '<div style="font-size:12px;opacity:.85;margin-top:6px">与 UE 虚拟引擎同学共建的虚实结合研学体验</div>' +
+      '<div style="font-size:12px;opacity:.85;margin-top:6px">虚实结合的香云纱数字孪生研学体验</div>' +
     '</div>' +
     '<div class="card"><div class="card-title"><span class="ct-left">📡 对接状态</span></div>' +
       '<div class="list-row"><div class="lr-ico">🖥️</div><div class="lr-main"><b>会话编号</b><span>' + (API.session_id || "未创建") + '</span></div></div>' +
       '<div class="list-row"><div class="lr-ico">🌐</div><div class="lr-main"><b>后端服务</b><span>' + (API.online ? "在线" : "离线") + '</span></div></div>' +
-      '<div class="list-row"><div class="lr-ico">🎮</div><div class="lr-main"><b>UE4 虚拟引擎</b><span>通过 /api/ue/events 接口对接</span></div></div>' +
+      '<div class="list-row"><div class="lr-ico">🎮</div><div class="lr-main"><b>数字孪生引擎</b><span>实时联动工艺场景</span></div></div>' +
     '</div>' +
     '<div class="card"><div class="card-title"><span class="ct-left">🔁 已接收的联动事件</span><span class="ct-right">' + d.ueEvents.length + ' 条</span></div>' +
       (d.ueEvents.length ? d.ueEvents.map(function (e) {
         return '<div class="list-row"><div class="lr-ico">' + (e.operation_result === "correct" ? "✅" : "⚠️") + '</div>' +
           '<div class="lr-main"><b>' + e.task_id + '</b><span>' + e.operation_result + ' · ' + e.time + '</span></div></div>';
-      }).join("") : '<div class="empty" style="padding:16px"><div class="d">暂无联动记录，等待 UE 虚拟引擎同学提交工艺操作结果</div></div>') +
+      }).join("") : '<div class="empty" style="padding:16px"><div class="d">暂无联动记录，等待现场工艺操作上报</div></div>') +
     '</div>' +
-    '<button class="btn btn-primary btn-block" id="ueSimulateBtn">模拟接收 UE 事件（演示）</button>';
+    '<button class="btn btn-primary btn-block" id="ueSimulateBtn">模拟接收联动事件（演示）</button>';
 
   Nav.go("v-ue", { after: function () {
     $("#ueBody .back-btn").addEventListener("click", Nav.back);
@@ -1714,7 +1757,7 @@ function openUePanel() {
         if (result === "correct") { d.user.xp += 15; Store.save(); renderStatus(); }
         Sound.success();
         confetti(30);
-        toast("已接收 UE 联动事件", { ico: "🔗" });
+        toast("已接收数字孪生联动事件", { ico: "🔗" });
         openUePanel();
       });
     });
@@ -1728,287 +1771,14 @@ function openGames() {
 
 /* ---------------------------------------------------------------- 真实地图视图 */
 function openRealMap() {
-  Nav.go("v-map");            // 先切到地图视图（会触发 renderMap 重建，下方再覆盖为真实地图）
-  var geo = YS_GEO;
-  var ps = geo.points, keys = Object.keys(ps);
-
-  // 投影：把所有点位（含基地中心）按真实经纬度映射到 1000x750 画布，留边距
-  var lats = keys.map(function (k) { return ps[k].lat; }).concat([geo.center.lat]);
-  var lngs = keys.map(function (k) { return ps[k].lng; }).concat([geo.center.lng]);
-  var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
-  var minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
-  var padLat = (maxLat - minLat) * 0.34 || 0.001, padLng = (maxLng - minLng) * 0.34 || 0.001;
-  minLat -= padLat; maxLat += padLat; minLng -= padLng; maxLng += padLng;
-
-  var X0 = 70, X1 = 930, Y0 = 60, Y1 = 690;
-  function proj(lat, lng) {
-    var fx = (lng - minLng) / (maxLng - minLng);
-    var fy = (maxLat - lat) / (maxLat - minLat);
-    return { x: X0 + fx * (X1 - X0), y: Y0 + fy * (Y1 - Y0), fx: fx, fy: fy };
+  /* 真实地图：委托给 realmap.js（腾讯地图 GL JS）。
+     Key 未配置时显示引导页；加载失败时降级，不影响手绘地图。 */
+  if (typeof window.RealMap !== "undefined" && window.RealMap.open) {
+    RealMap.open();
+    return;
   }
-  function at(lat, lng) { var p = proj(lat, lng); return { left: p.fx * 100, top: p.fy * 100 }; }
-
-  var P = {}; keys.forEach(function (k) { P[k] = proj(ps[k].lat, ps[k].lng); });
-  var C = proj(geo.center.lat, geo.center.lng);
-  var r = P.RIVER, d = P.DRYING_FIELD, h = P.HALL, w = P.WORKSHOP, ct = C;
-
-  // —— 景区手绘导览图（纯 SVG，离线可用，高精度绘制）——
-
-  function treeAt(x, y, s) {
-    s = s || 1;
-    return '<g>' +
-      '<ellipse cx="' + x + '" cy="' + (y + 11 * s) + '" rx="' + (14 * s) + '" ry="' + (6 * s) + '" fill="rgba(55,45,25,.16)"/>' +
-      '<circle cx="' + x + '" cy="' + y + '" r="' + (13 * s) + '" fill="#93A86B"/>' +
-      '<circle cx="' + (x - 6 * s) + '" cy="' + (y - 4 * s) + '" r="' + (9 * s) + '" fill="#A6BA7C"/>' +
-      '<circle cx="' + (x + 6 * s) + '" cy="' + (y - 3 * s) + '" r="' + (8 * s) + '" fill="#84995C"/>' +
-      '<circle cx="' + (x) + '" cy="' + (y - 8 * s) + '" r="' + (6 * s) + '" fill="#B4C88B"/>' +
-      '</g>';
-  }
-
-  function hallComplex(x, y) {
-    var g = '<g filter="url(#softG)">';
-    g += '<ellipse cx="' + x + '" cy="' + (y + 56) + '" rx="84" ry="26" fill="rgba(55,42,25,.18)"/>';
-    g += '<rect x="' + (x - 76) + '" y="' + (y - 46) + '" width="152" height="104" rx="12" fill="#EEE2CB" stroke="#D8C7A6" stroke-width="2"/>';
-    g += '<rect x="' + (x - 64) + '" y="' + (y - 34) + '" width="128" height="80" rx="7" fill="#E7D9BC"/>';
-    g += '<rect x="' + (x - 46) + '" y="' + (y - 24) + '" width="92" height="54" rx="4" fill="url(#wallG)" stroke="#C9B48D" stroke-width="1.5"/>';
-    g += '<path d="M ' + (x - 60) + ' ' + (y - 24) + ' L ' + (x - 46) + ' ' + (y - 50) + ' L ' + (x + 46) + ' ' + (y - 50) + ' L ' + (x + 60) + ' ' + (y - 24) + ' Z" fill="url(#roofG)" stroke="#7E2E23" stroke-width="1.5"/>';
-    g += '<path d="M ' + (x - 46) + ' ' + (y - 50) + ' L ' + x + ' ' + (y - 66) + ' L ' + (x + 46) + ' ' + (y - 50) + ' Z" fill="#B5543E" stroke="#7E2E23" stroke-width="1.5"/>';
-    g += '<line x1="' + (x - 48) + '" y1="' + (y - 50) + '" x2="' + (x + 48) + '" y2="' + (y - 50) + '" stroke="#F0D9B5" stroke-width="1.6"/>';
-    g += '<rect x="' + (x - 12) + '" y="' + (y + 4) + '" width="24" height="26" rx="2" fill="#7E4A32"/>';
-    g += '<rect x="' + (x - 37) + '" y="' + (y - 6) + '" width="15" height="15" rx="2" fill="#F6EAD6" stroke="#B99B6E"/>';
-    g += '<rect x="' + (x + 22) + '" y="' + (y - 6) + '" width="15" height="15" rx="2" fill="#F6EAD6" stroke="#B99B6E"/>';
-    g += '<circle cx="' + (x - 32) + '" cy="' + (y - 18) + '" r="3.6" fill="#D24B3A"/>';
-    g += '<circle cx="' + (x + 32) + '" cy="' + (y - 18) + '" r="3.6" fill="#D24B3A"/>';
-    g += '</g>';
-    return g;
-  }
-
-  function workshopComplex(x, y) {
-    var g = '<g filter="url(#softG)">';
-    g += '<ellipse cx="' + x + '" cy="' + (y + 44) + '" rx="62" ry="20" fill="rgba(55,42,25,.18)"/>';
-    g += '<rect x="' + (x - 50) + '" y="' + (y - 4) + '" width="100" height="44" rx="4" fill="#DFD0B4" stroke="#BFA979" stroke-width="1.5"/>';
-    var n = 4, ww = 100 / n;
-    for (var i = 0; i < n; i++) {
-      var x0 = x - 50 + i * ww;
-      g += '<path d="M ' + x0 + ' ' + (y - 4) + ' L ' + (x0 + ww) + ' ' + (y - 4) + ' L ' + (x0 + ww) + ' ' + (y - 18) + ' Z" fill="#8A6A48"/>';
-    }
-    g += '<rect x="' + (x + 28) + '" y="' + (y - 40) + '" width="11" height="28" rx="2" fill="#9E3B2F"/>';
-    g += '<rect x="' + (x + 26) + '" y="' + (y - 42) + '" width="15" height="4" rx="1" fill="#7E2E23"/>';
-    g += '<rect x="' + (x - 44) + '" y="' + (y + 52) + '" width="88" height="32" rx="13" fill="url(#waterG)" stroke="#6E9AA8" stroke-width="1.5"/>';
-    g += '<path d="M ' + (x - 28) + ' ' + (y + 68) + ' q 9 -6 18 0 t 18 0" fill="none" stroke="rgba(255,255,255,.65)" stroke-width="1.6"/>';
-    g += '</g>';
-    return g;
-  }
-
-  function fieldComplex(x, y) {
-    var g = '<g filter="url(#softG)">';
-    g += '<rect x="' + (x - 116) + '" y="' + (y - 84) + '" width="232" height="168" rx="26" fill="url(#lawnG)" stroke="#7E9358" stroke-width="1.5"/>';
-    g += '<rect x="' + (x - 116) + '" y="' + (y - 84) + '" width="232" height="168" rx="26" fill="none" stroke="#6E8350" stroke-width="3" opacity=".28"/>';
-    for (var rr = 0; rr < 4; rr++) {
-      for (var cc2 = 0; cc2 < 2; cc2++) {
-        var bx = x - 92 + cc2 * 102, by = y - 62 + rr * 36;
-        g += '<rect x="' + bx + '" y="' + by + '" width="84" height="18" rx="4" fill="#C8A97E"/>';
-        g += '<rect x="' + bx + '" y="' + by + '" width="84" height="6" rx="3" fill="#DBC29A"/>';
-        g += '<line x1="' + (bx + 4) + '" y1="' + (by + 3) + '" x2="' + (bx + 80) + '" y2="' + (by + 3) + '" stroke="#A9805A" stroke-width="1"/>';
-        g += '<line x1="' + (bx + 4) + '" y1="' + (by + 12) + '" x2="' + (bx + 80) + '" y2="' + (by + 12) + '" stroke="#B9976E" stroke-width=".8" opacity=".7"/>';
-      }
-    }
-    g += '</g>';
-    return g;
-  }
-
-  function pathD(pts) {
-    var dd = 'M ' + pts[0][0] + ' ' + pts[0][1];
-    for (var i = 1; i < pts.length; i++) {
-      var a = pts[i - 1], b = pts[i];
-      var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
-      dd += ' Q ' + mx + ' ' + (my - 16) + ' ' + b[0] + ' ' + b[1];
-    }
-    return dd;
-  }
-
-  var roadDefs = [
-    [[ct.x, ct.y], [h.x, h.y]],
-    [[ct.x, ct.y], [w.x, w.y]],
-    [[w.x, w.y], [r.x, r.y]],
-    [[h.x, h.y], [d.x, d.y]],
-    [[w.x, w.y], [d.x, d.y]]
-  ];
-  var roads = roadDefs.map(function (pts) {
-    var pd = pathD(pts);
-    return '<path d="' + pd + '" fill="none" stroke="#DCCBA6" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<path d="' + pd + '" fill="none" stroke="#F0E6CD" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<path class="road-dash" d="' + pd + '" fill="none" stroke="#C9B48D" stroke-width="1.6" stroke-dasharray="5 11" stroke-linecap="round"/>';
-  }).join("");
-
-  var riverP = 'M -30 ' + (r.y - 96) + ' C ' + (r.x - 150) + ' ' + (r.y - 80) + ', ' + (r.x - 96) + ' ' + (r.y + 4) + ', ' + r.x + ' ' + r.y +
-    ' C ' + (r.x + 150) + ' ' + (r.y - 4) + ', ' + (r.x + 250) + ' ' + (r.y + 120) + ', 1030 ' + (r.y + 84);
-  var river = '<path d="' + riverP + '" fill="none" stroke="#9BBDC6" stroke-width="58" stroke-linecap="round"/>' +
-    '<path d="' + riverP + '" fill="none" stroke="url(#waterG)" stroke-width="46" stroke-linecap="round"/>' +
-    '<path d="' + riverP + '" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="2.2" stroke-dasharray="16 24" stroke-linecap="round"/>' +
-    '<g transform="translate(' + r.x + ',' + r.y + ')">' +
-    '<rect x="-30" y="-9" width="60" height="18" rx="7" fill="#CBA97B" stroke="#9A7A4E" stroke-width="1.5"/>' +
-    '<line x1="-30" y1="0" x2="30" y2="0" stroke="#B08D5E" stroke-width="2"/>' +
-    '<line x1="-22" y1="-9" x2="-22" y2="9" stroke="#B08D5E" stroke-width="1.5"/>' +
-    '<line x1="22" y1="-9" x2="22" y2="9" stroke="#B08D5E" stroke-width="1.5"/>' +
-    '</g>';
-
-  var paddies =
-    '<g opacity=".55">' +
-    '<polygon points="20,70 210,46 262,168 60,196" fill="#E2E6C2" stroke="#C4CF98" stroke-width="1.5"/>' +
-    '<polygon points="250,60 420,40 470,150 300,172" fill="#DDE2B8" stroke="#BFCB92" stroke-width="1.5"/>' +
-    '<polygon points="760,560 980,520 1000,700 800,720" fill="#E2E6C2" stroke="#C4CF98" stroke-width="1.5"/>' +
-    '<polygon points="30,560 200,540 240,700 50,720" fill="#DDE2B8" stroke="#BFCB92" stroke-width="1.5"/>' +
-    '</g>' +
-    '<g stroke="#CBD3A6" stroke-width="1" opacity=".5">' +
-    '<line x1="20" y1="110" x2="240" y2="90"/><line x1="40" y1="140" x2="255" y2="120"/>' +
-    '<line x1="760" y1="620" x2="995" y2="590"/><line x1="780" y1="660" x2="1000" y2="640"/>' +
-    '</g>';
-
-  var trees = [
-    treeAt(120, 150, 1.15), treeAt(175, 205, .95), treeAt(95, 300, 1.2), treeAt(150, 350, .9),
-    treeAt(300, 120, 1.0), treeAt(360, 210, .85), treeAt(880, 330, 1.1), treeAt(820, 400, .95),
-    treeAt(150, 470, 1.0), treeAt(560, 500, .9), treeAt(650, 470, 1.05), treeAt(700, 540, .85),
-    treeAt(430, 300, .8), treeAt(560, 220, .85), treeAt(320, 560, .9), treeAt(880, 560, .95)
-  ].join("");
-
-  var svg =
-    '<svg viewBox="0 0 1000 750" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">' +
-    '<defs>' +
-    '<linearGradient id="terrG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F5EFDD"/><stop offset=".55" stop-color="#EDE3CC"/><stop offset="1" stop-color="#E2D3B6"/></linearGradient>' +
-    '<radialGradient id="vigG" cx="50%" cy="46%" r="72%"><stop offset="55%" stop-color="rgba(60,42,25,0)"/><stop offset="100%" stop-color="rgba(60,42,25,.22)"/></radialGradient>' +
-    '<linearGradient id="waterG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A7CBD4"/><stop offset="1" stop-color="#7BA6B4"/></linearGradient>' +
-    '<linearGradient id="lawnG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B7CB8C"/><stop offset="1" stop-color="#9DB675"/></linearGradient>' +
-    '<linearGradient id="roofG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C05A44"/><stop offset="1" stop-color="#8E3226"/></linearGradient>' +
-    '<linearGradient id="wallG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7EEDB"/><stop offset="1" stop-color="#E9DABE"/></linearGradient>' +
-    '<filter id="softG" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="2.4" flood-color="#3A2A19" flood-opacity=".18"/></filter>' +
-    '</defs>' +
-    '<rect x="0" y="0" width="1000" height="750" fill="url(#terrG)"/>' +
-    '<g opacity=".5">' +
-    '<circle cx="140" cy="90" r="1.4" fill="#D9C9A6"/><circle cx="320" cy="64" r="1.2" fill="#D9C9A6"/><circle cx="520" cy="110" r="1.3" fill="#D9C9A6"/>' +
-    '<circle cx="720" cy="70" r="1.2" fill="#D9C9A6"/><circle cx="900" cy="120" r="1.4" fill="#D9C9A6"/><circle cx="240" cy="300" r="1.2" fill="#D9C9A6"/>' +
-    '<circle cx="660" cy="330" r="1.3" fill="#D9C9A6"/><circle cx="120" cy="600" r="1.4" fill="#D9C9A6"/><circle cx="500" cy="690" r="1.2" fill="#D9C9A6"/>' +
-    '<circle cx="860" cy="660" r="1.4" fill="#D9C9A6"/>' +
-    '</g>' +
-    paddies +
-    river +
-    roads +
-    fieldComplex(d.x, d.y) +
-    hallComplex(h.x, h.y) +
-    workshopComplex(w.x, w.y) +
-    trees +
-    '<g transform="translate(928,664)">' +
-    '<circle r="30" fill="rgba(255,255,255,.9)" stroke="#C9B79A" stroke-width="2"/>' +
-    '<circle r="23" fill="none" stroke="#E0D3B8" stroke-width="1"/>' +
-    '<path d="M0 -19 L6 3 L0 -2 L-6 3 Z" fill="#9E3B2F"/>' +
-    '<path d="M0 19 L4 1 L0 4 L-4 1 Z" fill="#C0AF90"/>' +
-    '<text y="-36" text-anchor="middle" font-size="12" font-weight="800" fill="#7E2E23">N</text>' +
-    '</g>' +
-    '<g transform="translate(72,716)">' +
-    '<rect x="-8" y="-14" width="186" height="20" rx="6" fill="rgba(255,255,255,.78)"/>' +
-    '<line x1="0" y1="0" x2="166" y2="0" stroke="#83533B" stroke-width="2.6"/>' +
-    '<line x1="0" y1="-5" x2="0" y2="5" stroke="#83533B" stroke-width="2.6"/>' +
-    '<line x1="83" y1="-5" x2="83" y2="5" stroke="#83533B" stroke-width="2.4"/>' +
-    '<line x1="166" y1="-5" x2="166" y2="5" stroke="#83533B" stroke-width="2.6"/>' +
-    '<text x="0" y="-6" font-size="11" fill="#6B574A">0</text>' +
-    '<text x="150" y="-6" font-size="11" fill="#6B574A">约200米</text>' +
-    '</g>' +
-    '<rect x="0" y="0" width="1000" height="750" fill="url(#vigG)" pointer-events="none"/>' +
-    '</svg>';
-
-  // 点位标记（圆形徽章，按真实经纬度定位）
-  var PMETA = {
-    HALL: { ch: "馆", pc: "#9E3B2F" },
-    WORKSHOP: { ch: "坊", pc: "#83533B" },
-    DRYING_FIELD: { ch: "场", pc: "#6E8B4E" },
-    RIVER: { ch: "河", pc: "#5F93A6" }
-  };
-  var markers = keys.map(function (k) {
-    var p = ps[k], c = at(p.lat, p.lng), m = PMETA[k] || { ch: "点", pc: "#83533B" };
-    return '<div class="map-pin' + (c.left > 72 ? ' flip' : '') + '" data-point="' + k + '" style="left:' + c.left + '%;top:' + c.top + '%;--pc:' + m.pc + '">' +
-      '<div class="mp-badge">' + m.ch + '</div>' +
-      '<div class="mp-label">' + p.name + '</div></div>';
-  }).join("");
-  var cc = at(geo.center.lat, geo.center.lng);
-  var centerMark = '<div class="map-center" style="left:' + cc.left + '%;top:' + cc.top + '%"><div class="mc-pulse"></div><div class="mc-dot"></div><div class="mc-label">基地中心</div></div>';
-
-  $("#mapBody").innerHTML =
-    '<div class="subhead"><button class="back-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><h2>香云纱非遗园区</h2></div>' +
-    '<div style="font-size:12px;color:var(--ink-3);margin-bottom:10px;text-align:center">' + geo.region + ' · 手绘导览图（点位按真实经纬度定位）</div>' +
-    '<div class="map-stage" id="mapStage">' +
-      '<div class="map-zoom" id="mapZoom">' + svg + markers + centerMark + '</div>' +
-      '<div class="map-legend">' +
-        '<span><i class="lg lg-hall"></i>主馆</span><span><i class="lg lg-work"></i>工作坊</span>' +
-        '<span><i class="lg lg-field"></i>晒莨场</span><span><i class="lg lg-river"></i>河涌</span>' +
-        '<span><i class="lg lg-route"></i>游览路线</span>' +
-      '</div>' +
-      '<div class="map-controls">' +
-        '<button class="icon-btn" id="realZoomIn">＋</button>' +
-        '<button class="icon-btn" id="realZoomOut">－</button>' +
-        '<button class="icon-btn" id="realReset">⟲</button>' +
-      '</div>' +
-    '</div>' +
-    '<div style="margin-top:14px" class="card">' +
-      '<div class="card-title"><span class="ct-left">📍 点位坐标（真实经纬度）</span></div>' +
-      keys.map(function (k) {
-        var p = ps[k];
-        return '<div class="list-row" data-point="' + k + '" style="cursor:pointer">' +
-          '<div class="lr-ico">📍</div>' +
-          '<div class="lr-main"><b>' + p.name + '</b><span>' + p.lat.toFixed(5) + '°N, ' + p.lng.toFixed(5) + '°E</span></div>' +
-          '<span class="lr-arrow">›</span></div>';
-      }).join("") +
-    '</div>' +
-    '<button class="btn btn-ghost btn-block" id="realBackToMap">返回手绘地图</button>';
-
-  // 绑定事件
-  $("#mapBody .back-btn").addEventListener("click", function () { Nav.back(); });
-  $("#realBackToMap").addEventListener("click", function () { Nav.go("v-map"); });
-
-  // 缩放 + 拖拽平移
-  var stage = $("#mapStage"), zoomEl = $("#mapZoom");
-  var scale = 1, tx = 0, ty = 0;
-  function applyT() { zoomEl.style.transform = "translate(" + tx + "px," + ty + "px) scale(" + scale + ")"; zoomEl.style.setProperty("--z", scale); }
-  function clampPan() {
-    var b = stage.getBoundingClientRect();
-    var mx = b.width * (scale - 1) / 2, my = b.height * (scale - 1) / 2;
-    tx = Math.max(-mx, Math.min(mx, tx)); ty = Math.max(-my, Math.min(my, ty));
-  }
-  $("#realZoomIn").addEventListener("click", function () { scale = Math.min(3, scale * 1.3); if (scale <= 1.01) { scale = 1; tx = 0; ty = 0; } clampPan(); applyT(); });
-  $("#realZoomOut").addEventListener("click", function () { scale = Math.max(1, scale / 1.3); if (scale <= 1.01) { scale = 1; tx = 0; ty = 0; } clampPan(); applyT(); });
-  $("#realReset").addEventListener("click", function () { scale = 1; tx = 0; ty = 0; applyT(); });
-
-  var down = false, moved = false, sx = 0, sy = 0, stx = 0, sty = 0;
-  stage.addEventListener("pointerdown", function (e) { if (scale <= 1.01) return; down = true; moved = false; sx = e.clientX; sy = e.clientY; stx = tx; sty = ty; });
-  stage.addEventListener("pointermove", function (e) {
-    if (!down) return;
-    var dx = e.clientX - sx, dy = e.clientY - sy;
-    if (!moved && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) { moved = true; try { stage.setPointerCapture(e.pointerId); } catch (_) {} stage.classList.add("grabbing"); }
-    if (moved) { tx = stx + dx; ty = sty + dy; clampPan(); applyT(); }
-  });
-  function endDrag() { if (moved) stage.classList.remove("grabbing"); down = false; moved = false; }
-  stage.addEventListener("pointerup", endDrag);
-  stage.addEventListener("pointercancel", endDrag);
-
-  $$("#mapBody .map-pin").forEach(function (m) {
-    m.addEventListener("click", function () { openPoint(m.dataset.point); });
-  });
-  $$("#mapBody .list-row").forEach(function (r) {
-    r.addEventListener("click", function () { if (r.dataset.point) openPoint(r.dataset.point); });
-  });
+  toast("真实地图模块未加载，请检查 js/realmap.js", { ico: "⚠️" });
 }
-
-/* ---------------------------------------------------------------- 老师端（教学管理）
-   说明：本应用为本地单机版，仅记录「当前登录账号」的真实进度。
-   班级级数据（全班学员、校级统计）需接入教学管理系统后才有，
-   因此一律以真实本地数据呈现，不编造任何学员或统计。 */
-/* ---------------------------------------------------------------- 研学数据看板（教学管理端）
-   定位：单机版的数据查看与汇总工具，不模拟班级、不生成任何虚构学员。
-   数据仅来自：① 本机账号真实学习记录 ② 老师主动导入的真实导出文件。
-   多机数据可通过「导出 → 导入」真实汇总成班级视图。
-   ---------------------------------------------------------------- */
-var TeacherTab = "overview";
-
-/* 当前账号的可导出记录：只包含真实产生的字段 */
 function teacherOwnRecord() {
   var d = Store.data;
   var games = 0, g = d.games || {};
@@ -2053,7 +1823,7 @@ function renderTeacher() {
           '<div style="font-size:16px;font-weight:800">' + esc(d.user.name || "研学学员") + '</div>' +
           '<div style="font-size:12px;opacity:.85;margin-top:4px">' + (d.user.school || "未填写学校/班级") + ' · 加入 ' + esc(d.user.joined || "—") + '</div>' +
         '</div>' +
-        '<span class="tag" style="background:rgba(255,255,255,.18);color:#fff;border:none">Lv.' + li.cur.lv + '</span>' +
+        levelBadgeHTML(li.cur.lv, { tag: true }) +
       '</div>' +
       '<div style="display:flex;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.15)">' +
         '<div style="flex:1;text-align:center"><div style="font-size:20px;font-weight:800">' + Store.roundNum(d.user.xp) + '</div><div style="font-size:11px;opacity:.8">累计积分</div></div>' +
@@ -2101,7 +1871,7 @@ function renderTeacherPanel() {
         '</div>' +
       '</div>' +
       '<div class="card"><div class="card-title"><span class="ct-left">🎯 等级进度</span></div>' +
-        '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>Lv.' + li.cur.lv + ' ' + li.cur.name + '</span><span style="color:var(--ink-3)">' + Store.roundNum(d.user.xp) + ' 积分 · 🪙 ' + Store.roundNum(d.user.coins) + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:6px"><span style="display:inline-flex;align-items:center;gap:6px">' + levelBadgeHTML(li.cur.lv, { tag: true }) + titleBadgeHTML(getTitle()) + '</span><span style="color:var(--ink-3)">' + Store.roundNum(d.user.xp) + ' 积分 · 🪙 ' + Store.roundNum(d.user.coins) + '</span></div>' +
         '<div class="pbar gold"><i style="width:' + lvPct + '%"></i></div>' +
       '</div>' +
       teacherClassSummary();
@@ -2136,7 +1906,7 @@ function renderTeacherPanel() {
       '</div>';
   } else if (TeacherTab === "成绩记录") {
     var all = [];
-    var names = { quiz: "知识问答", mud: "涂河泥", rhythm: "煮绸节拍", sort: "工序排序", memory: "翻牌记忆", lane: "晒莨节奏" };
+    var names = { quiz: "知识问答", mud: "晒莨抢晴", rhythm: "莨水配比", sort: "工序排序", memory: "翻牌记忆", lane: "晒莨节奏" };
     Object.keys(d.games || {}).forEach(function (k) {
       (d.games[k] || []).forEach(function (g) {
         all.push({ name: names[k] || k, date: g.date || "—", score: g.score || 0 });

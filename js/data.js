@@ -217,8 +217,8 @@ var YS_KNOWLEDGE = [
   },
   {
     id: "K06", point_id: "DRYING_FIELD", title: "为什么强调晒场尺度？", category: "数字场景", image: PHOTO.dryingLake,
-    text: "草地晒场在基地视觉与生产空间中占据重要位置，UE4场景应优先表现其开阔尺度。",
-    detail: "在数字孪生场景中，晒莨场的开阔感直接影响研学体验的真实度。UE4 虚拟引擎场景应突出长幅布匹、草地纹理与工作路线的比例关系，让学习者身临其境地感受「十八晒」的壮观。",
+    text: "草地晒场在基地视觉与生产空间中占据重要位置，数字孪生场景应优先表现其开阔尺度。",
+    detail: "在数字孪生场景中，晒莨场的开阔感直接影响研学体验的真实度。数字孪生场景应突出长幅布匹、草地纹理与工作路线的比例关系，让学习者身临其境地感受「十八晒」的壮观。",
     steps: []
   },
   {
@@ -336,14 +336,21 @@ var YS_MASTERS = [
 
 /* ---------------------------------------------------------------- 等级体系 */
 var YS_LEVELS = [
-  { lv: 1, name: "寻纱学徒", xp: 0 },
-  { lv: 2, name: "晒莨小工", xp: 120 },
-  { lv: 3, name: "染整匠人", xp: 320 },
-  { lv: 4, name: "过泥能手", xp: 640 },
-  { lv: 5, name: "煮绸师傅", xp: 1100 },
-  { lv: 6, name: "晒场管事", xp: 1700 },
-  { lv: 7, name: "香云传承人", xp: 2500 },
-  { lv: 8, name: "莨珠大师", xp: 3600 }
+  { lv: 1,  name: "寻纱学徒",   xp: 0 },
+  { lv: 2,  name: "晒莨小工",   xp: 120 },
+  { lv: 3,  name: "染整匠人",   xp: 320 },
+  { lv: 4,  name: "过泥能手",   xp: 640 },
+  { lv: 5,  name: "煮绸师傅",   xp: 1100 },
+  { lv: 6,  name: "晒场管事",   xp: 1700 },
+  { lv: 7,  name: "香云传承人", xp: 2500 },
+  { lv: 8,  name: "莨珠大师",   xp: 3600 },
+  { lv: 9,  name: "薯莨妙手",   xp: 5000 },
+  { lv: 10, name: "三蒸九煮",   xp: 6800 },
+  { lv: 11, name: "河泥洗练",   xp: 9000 },
+  { lv: 12, name: "十八晒匠",   xp: 11800 },
+  { lv: 13, name: "云纱织造师", xp: 15200 },
+  { lv: 14, name: "岭南织云者", xp: 19500 },
+  { lv: 15, name: "香云纱宗师", xp: 25000 }
 ];
 
 /* ---------------------------------------------------------------- 成就体系 */
@@ -364,7 +371,7 @@ var YS_ACHIEVEMENTS = [
   { id: "rhythm_1", name: "调色有方", desc: "完成一次莨水配比", ico: "🎨" },
   { id: "sort_1", name: "工序排序", desc: "完成一次工序排序游戏", ico: "🔀" },
   { id: "memory_1", name: "翻牌记忆", desc: "完成一次翻牌记忆游戏", ico: "🃏" },
-  { id: "ue_link", name: "虚实相生", desc: "接收 UE 虚拟引擎的联动数据", ico: "🔗" },
+  { id: "ue_link", name: "虚实相生", desc: "接收数字孪生的联动数据", ico: "🔗" },
   { id: "cert", name: "研学结业", desc: "生成研学证书", ico: "📜" },
   { id: "xp_1000", name: "积分破千", desc: "累计积分达到 1000", ico: "✨" },
   { id: "all_games", name: "游戏达人", desc: "玩过所有小游戏", ico: "🎮" }
@@ -389,7 +396,7 @@ var YS_QUIZ = [
   { q: "工作坊湿作业区主要负责？", opts: ["浸染煮绸过泥清洗", "卷布打包", "展陈讲解", "仓储"], a: 0, exp: "湿作业区承担浸染、煮绸、过泥、清洗等环节。" },
   { q: "卷布整理是生产中的？", opts: ["品质控制环节", "染色环节", "种植环节", "运输环节"], a: 0, exp: "卷布整理是品质控制的最后一环。" },
   { q: "晒莨场为什么要留作业通道？", opts: ["便于翻布补浆", "装饰美观", "排水", "停车"], a: 0, exp: "作业通道便于工人翻布、补浆与检查。" },
-  { q: "香云纱的数字研学中，UE4 主要表现？", opts: ["晒场开阔尺度", "答题界面", "积分系统", "签到"], a: 0, exp: "UE4 虚拟场景优先表现晒场的开阔尺度与工作路线。" },
+  { q: "香云纱的数字研学中，数字孪生场景主要表现？", opts: ["晒场开阔尺度", "答题界面", "积分系统", "签到"], a: 0, exp: "数字孪生场景优先表现晒场的开阔尺度与工作路线。" },
   { q: "仓储环境需要注意？", opts: ["防潮防虫避光", "高温暴晒", "潮湿", "强光直射"], a: 0, exp: "仓储需防潮、防虫、避光，保持质感。" },
   { q: "香云纱制作的核心精神是？", opts: ["匠心与耐心", "追求速度", "机械化", "批量复制"], a: 0, exp: "三蒸九煮十八晒体现的是匠心与耐心。" }
 ];
@@ -441,17 +448,23 @@ var YS_SHOP = [
   { id: "icon_mud", name: "头像·河泥印", ico: "🟫", price: 120, type: "decor", desc: "河泥媒染印象头像", av: { ico: "泥", bg: "linear-gradient(135deg,#5E6B45,#9DAE75)" } },
   { id: "icon_sun", name: "头像·晒莨场", ico: "☀️", price: 120, type: "decor", desc: "草地晒场主题头像", av: { ico: "晒", bg: "linear-gradient(135deg,#D0A24E,#EFD39B)" } },
   { id: "icon_silk", name: "头像·乌光泽", ico: "⚫", price: 160, type: "decor", desc: "香云纱乌黑光泽", av: { ico: "乌", bg: "linear-gradient(135deg,#2E2119,#6E4420)" } },
-  { id: "theme_gold", name: "主题·泥金", ico: "🌟", price: 300, type: "theme", skin: "gold", sw: ["#A9742B", "#EBCC8E"], desc: "泥金暖阳配色，界面转为鎏金质感" },
-  { id: "theme_grass", name: "主题·草绿", ico: "🌿", price: 300, type: "theme", skin: "grass", sw: ["#5E7A4B", "#BFD08A"], desc: "晒场草绿配色，清透自然" },
-  { id: "title_master", name: "称号·工艺大师", ico: "🎖️", price: 500, type: "title", desc: "佩戴后显示在昵称旁" },
-  { id: "title_legend", name: "称号·非遗宗师", ico: "👑", price: 1000, type: "title", desc: "最高荣誉称号" }
+  /* 主题商品由 YS_THEMES 自动生成（见 reward.js themeShopItems），避免双处维护 */
 ];
 
-/* ---------------------------------------------------------------- 主题外观（皮肤） */
+/* ---------------------------------------------------------------- 主题外观（皮肤）
+   9 套配色：默认 + 8 款可购买。每款含整套 CSS 变量（app.css）与背景蒙版（theme3d.css）。
+   price>0 的主题会出现在传承商店；id="" 为默认免费主题。
+   背景 veil 与照片滤镜随主题变化，切换后整屏色调明显不同。 */
 var YS_THEMES = [
-  { id: "",           skin: "default", name: "茶褐原色", desc: "香云纱默认配色", sw: ["#83533B", "#D9AD71"] },
-  { id: "theme_gold", skin: "gold",    name: "泥金",     desc: "鎏金暖阳 · 富贵气", sw: ["#A9742B", "#EBCC8E"] },
-  { id: "theme_grass",skin: "grass",   name: "草绿",     desc: "晒场草绿 · 清透自然", sw: ["#5E7A4B", "#BFD08A"] }
+  { id: "",            skin: "default",  name: "茶褐原色", desc: "香云纱经典茶褐 · 默认配色",       sw: ["#83533B", "#D9AD71"], price: 0 },
+  { id: "theme_gold",  skin: "gold",     name: "泥金",      ico: "🌟",     desc: "鎏金暖阳 · 富贵气",              sw: ["#A9742B", "#EBCC8E"], price: 800 },
+  { id: "theme_grass", skin: "grass",    name: "草绿",      ico: "🌿",     desc: "晒场草绿 · 清透自然",            sw: ["#5E7A4B", "#BFD08A"], price: 800 },
+  { id: "theme_ocean", skin: "ocean",    name: "靛蓝",      ico: "🌊",     desc: "深海靛蓝 · 沉静澄澈",            sw: ["#2E5E96", "#8FC0E8"], price: 1200 },
+  { id: "theme_violet",skin: "violet",   name: "紫霞",      ico: "🔮",     desc: "暮色紫霞 · 梦幻雅致",            sw: ["#6E4BA8", "#C9A8EA"], price: 1200 },
+  { id: "theme_ink",   skin: "ink",      name: "墨韵",      ico: "🖤",     desc: "水墨青黑 · 沉稳高级（深色氛围）", sw: ["#2C3A38", "#7A9A93"], price: 1500 },
+  { id: "theme_sunset",skin: "sunset",   name: "丹霞",      ico: "🌅",     desc: "赭红丹霞 · 热烈明丽",            sw: ["#B0432F", "#EFA98B"], price: 1200 },
+  { id: "theme_celadon",skin:"celadon",  name: "青瓷",      ico: "🍵",     desc: "青瓷碧色 · 温润清雅",            sw: ["#3E8078", "#A6D8CF"], price: 1200 },
+  { id: "theme_sakura",skin: "sakura",   name: "樱粉",      ico: "🌸",     desc: "暖樱粉黛 · 柔和浪漫",            sw: ["#C25C7E", "#F0B8CC"], price: 1200 }
 ];
 
 /* ---------------------------------------------------------------- 盲盒奖池（权重） */
@@ -469,7 +482,7 @@ var YS_BANNERS = [
   { img: PHOTO.dryingPanorama, badge: "国家级非遗", kicker: "YUNSHA · 云纱智境", title: "发现<em>香云纱</em><br>六百年岭南匠心", sub: "三蒸九煮十八晒 · 薯莨染整 · 数字研学", act: "enc" },
   { img: PHOTO.workshopVat,    badge: "非遗工坊",   kicker: "工坊研学 · 实景课堂", title: "九煮十八晒<br><em>感受匠人手温</em>", sub: "染缸 · 晒架 · 过乌上泥，全流程实景体验", cta: "进工坊看看", act: "point", arg: "WORKSHOP" },
   { img: PHOTO.dryingRedYellow, badge: "数字体验",   kicker: "抢晴晒莨 · 与天争时", title: "接住<em>阳光</em><br>晒出一匹好莨纱", sub: "晒莨抢晴小游戏 · 手速与预判的双重考验", cta: "去玩晒莨抢晴", act: "mudgame" },
-  { img: PHOTO.dryingLake,     badge: "UE 联动",    kicker: "数字孪生 · 晒场实况", title: "云端晒莨场<br><em>虚实同步</em>", sub: "UE 引擎实时联动 · 天气与晒场状态同步", cta: "看实时数据", act: "ue" }
+  { img: PHOTO.dryingLake,     badge: "数字孪生",    kicker: "数字孪生 · 晒场实况", title: "云端晒莨场<br><em>虚实同步</em>", sub: "数字孪生实时联动 · 天气与晒场状态同步", cta: "看实时数据", act: "ue" }
 ];
 
 /* ---------------------------------------------------------------- 头像库 */
@@ -494,14 +507,41 @@ var YS_FRAMES = [
   { id: "fr_rainbow", name: "七彩框", price: 500, color: "linear-gradient(135deg,#C08A5B,#D9AD71,#667B55,#4A6B7A,#8C5A2B)", desc: "晒场彩虹" }
 ];
 
-/* ---------------------------------------------------------------- 称号库 */
+/* ---------------------------------------------------------------- 称号库
+   tier 稀有度：0 普通 / 1 精良 / 2 稀有 / 3 史诗 / 4 传说(炫彩流光)
+   等级越高显示越炫，传说档文字为不断变幻的炫彩色。
+   id 命名约定：商店商品 id = "title_" + 称号 id 去掉 "ti_" 前缀，便于自动映射。 */
 var YS_TITLES = [
-  { id: "ti_none", name: "无称号", price: 0, desc: "默认" },
-  { id: "ti_apprentice", name: "寻纱学徒", price: 0, desc: "完成首个任务解锁" },
-  { id: "ti_craftsman", name: "晒莨巧手", price: 200, desc: "熟练的晒莨工艺" },
-  { id: "ti_master", name: "工艺大师", price: 500, desc: "香云纱工艺大师" },
-  { id: "ti_legend", name: "非遗宗师", price: 1000, desc: "最高荣誉" }
+  /* 普通 t0 */
+  { id: "ti_none",       name: "无称号",     price: 0,    tier: 0, desc: "默认" },
+  { id: "ti_apprentice", name: "寻纱学徒",   price: 0,    tier: 0, desc: "完成首个任务解锁" },
+  /* 精良 t1 */
+  { id: "ti_craftsman",  name: "晒莨巧手",   price: 200,  tier: 1, desc: "熟练的晒莨工艺" },
+  { id: "ti_washer",     name: "过泥学徒",   price: 240,  tier: 1, desc: "初识河泥媒染" },
+  { id: "ti_sunner",     name: "晒场学徒",   price: 280,  tier: 1, desc: "看天晒莨的入门手艺" },
+  /* 稀有 t2 */
+  { id: "ti_master",     name: "工艺大师",   price: 500,  tier: 2, desc: "香云纱工艺大师" },
+  { id: "ti_boiler",     name: "煮绸师傅",   price: 600,  tier: 2, desc: "三蒸九煮皆通" },
+  { id: "ti_dyer",       name: "染整能手",   price: 680,  tier: 2, desc: "薯莨染整的骨干" },
+  /* 史诗 t3 */
+  { id: "ti_heritage",   name: "香云传承人", price: 900,  tier: 3, desc: "非遗技艺的传承中坚" },
+  { id: "ti_guard",      name: "莨绸守艺人", price: 950,  tier: 3, desc: "守护传统晒莨工序" },
+  { id: "ti_weaver",     name: "云纱织造师", price: 1000, tier: 3, desc: "织造云霞般的香云纱" },
+  /* 传说 t4 · 炫彩流光 */
+  { id: "ti_legend",     name: "非遗宗师",   price: 1000, tier: 4, desc: "最高荣誉 · 炫彩加身" },
+  { id: "ti_saint",      name: "香云圣手",   price: 1600, tier: 4, desc: "一代宗匠 · 炫彩流光" },
+  { id: "ti_pearl",      name: "莨珠大师",   price: 2000, tier: 4, desc: "莨珠记的传奇人物" },
+  { id: "ti_immortal",   name: "一世宗师",   price: 2400, tier: 4, desc: "空前绝后 · 极致炫彩" }
 ];
+
+/* 等级 → 稀有度档位：15 级分 5 档，每 3 级升一档，越高级特效越多 */
+function titleTierOfLevel(lv) {
+  if (lv >= 13) return 4; // 传说：炫彩流光
+  if (lv >= 10) return 3; // 史诗：紫色流光
+  if (lv >= 7)  return 2; // 稀有：蓝色微光
+  if (lv >= 4)  return 1; // 精良：绿色
+  return 0;               // 普通：1-3 级
+}
 
 /* ---------------------------------------------------------------- 7 日签到奖励（递增） */
 var YS_SIGN_REWARDS = [
@@ -657,7 +697,7 @@ var YS_ENCYCLOPEDIA = [
       "晒莨场是香云纱生产中最具视觉冲击的空间：一米多宽、约十五米长的布匹被工人们平整摊开、拉紧绷直，成排铺在开阔的草地上，远望如彩色地毯。航拍视角下，红色、褐色、黑色的布幅与绿色草带交织，构成岭南水乡独有的大地景观。",
       "晒莨不只是「晒干」。阳光中的紫外线促进薯莨单宁氧化，使颜色由黄褐逐步转为沉稳的棕褐；草地柔软的支撑避免布面褶皱，通风与光照的均匀度直接影响色泽一致性。因此草地需经常修剪，工人要用扫帚不断扫匀汁液，还要用竹竿、锥子固定布匹防止被风掀起。",
       "有趣的是，向阳的一面颜色会变浅，贴草的一面颜色更深，这种微妙的正反面差异也是手工香云纱的魅力之一。风起时绸缎被拱成一道弧，被摄影者称为「阳光下的彩虹」。",
-      "晒场的开阔尺度、长幅布匹与作业通道的比例关系，也是 UE 虚拟引擎数字孪生场景需要优先还原的视觉特征——这也是本项目与 UE 组同学联动的重点。"
+      "晒场的开阔尺度、长幅布匹与作业通道的比例关系，也是数字孪生场景需要优先还原的视觉特征——这也是本项目与现场设备联动的重点。"
     ],
     facts: [
       { k: "单幅尺寸", v: "约 1m × 15m" },
@@ -711,7 +751,7 @@ var YS_ENCYCLOPEDIA = [
       "2008 年 6 月，「香云纱染整技艺」入选第二批国家级非物质文化遗产名录，顺德伦教成为传承地。2011 年，顺德香云纱获国家地理标志保护产品称号；2020 年入选「中欧地理标志协定」第二批保护名单。",
       "入选非遗后市场曾短暂升温，但因机器粗放生产导致质量参差，香云纱再次跌入低谷，2011 年顺德一度只剩 4 家工厂。繁复的手工工序决定了它无法完全工业化——这既是困境，也是它不可替代的价值。",
       "近年来，香云纱通过服装设计、T 台走秀、博物馆展陈重新进入公众视野。设计师把它做成旗袍、礼服与围巾，让古老的面料与现代审美对话；博物馆与文化机构则用展陈记录它的历史。",
-      "数字研学是另一条路径：本项目正是用 H5/App + UE 虚拟引擎的数字孪生场景，把园区导览、工艺体验、知识学习搬到屏幕上，让年轻一代足不出户也能理解并珍视这份非遗。让年轻人看见，非遗才有未来。"
+      "数字研学是另一条路径：本项目正是用 H5/App 的数字孪生场景，把园区导览、工艺体验、知识学习搬到屏幕上，让年轻一代足不出户也能理解并珍视这份非遗。让年轻人看见，非遗才有未来。"
     ],
     facts: [
       { k: "非遗级别", v: "国家级（2008 年）" },
@@ -761,3 +801,156 @@ var YS_ENCYC_CATS = ["全部", "溯源", "地理", "原料", "工艺", "成品",
 
 /* ---------------------------------------------------------------- 图片来源署名 */
 var YS_IMG_CREDIT = "本章配图来源于网络公开报道（南方日报、学习强国、新华网、佛山+ 等摄影作品）及项目概念图，仅用于研学教学演示，版权归原作者所有。";
+
+
+/* ==========================================================================
+   传承成长体系（香云纱文化语境的游戏化机制 —— 不用游戏术语）
+   上瘾感来自：收集（图鉴）/ 进度（研学季）/ 稀缺（限定皮肤）/ 连续（晒莨历）
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- 传承图鉴
+   卡片引用现有数据 id：kind = master / know / point / craft
+   集齐一套解锁套系奖励（传承币 + 积分 + 可能解锁限定皮肤） */
+var YS_CODEX = [
+  {
+    id: "craft", name: "匠心传承", icon: "🧑‍🏭", color: "#83533B",
+    desc: "寻访香云纱的背后匠人，记录他们的手艺与故事。",
+    cards: [
+      { id: "M01", name: "梁师傅 · 晒莨匠", kind: "master" },
+      { id: "M02", name: "陈师傅 · 涂泥工", kind: "master" },
+      { id: "M03", name: "织造艺人", kind: "master" },
+      { id: "M04", name: "染整师傅", kind: "master" },
+      { id: "M05", name: "晒场把式", kind: "master" },
+      { id: "M06", name: "非遗学者", kind: "master" }
+    ],
+    reward: { coins: 200, xp: 150, skin: "skin_weave" }
+  },
+  {
+    id: "process", name: "工序密码", icon: "⚗️", color: "#C98A2E",
+    desc: "读懂「三蒸九煮十八晒」，解开香云纱的工艺密码。",
+    cards: [
+      { id: "K01", name: "认识香云纱", kind: "know" },
+      { id: "K03", name: "薯莨取材", kind: "know" },
+      { id: "K05", name: "浸染上色", kind: "know" },
+      { id: "K07", name: "晒莨固色", kind: "know" },
+      { id: "K09", name: "河泥媒染", kind: "know" },
+      { id: "K11", name: "整理成纱", kind: "know" }
+    ],
+    reward: { coins: 220, xp: 180, skin: "skin_mud" }
+  },
+  {
+    id: "footprint", name: "寻纱足迹", icon: "📍", color: "#667B55",
+    desc: "走遍四大研学点位，把实地打卡的足迹收进图鉴。",
+    cards: [
+      { id: "HALL", name: "莨珠记主馆", kind: "point" },
+      { id: "WORKSHOP", name: "染整工作坊", kind: "point" },
+      { id: "DRYING_FIELD", name: "草地晒莨场", kind: "point" },
+      { id: "RIVER", name: "河涌泥料区", kind: "point" }
+    ],
+    reward: { coins: 180, xp: 120, skin: "skin_sun" }
+  },
+  {
+    id: "pattern", name: "纱品纹样", icon: "🧶", color: "#9E3B2F",
+    desc: "观察香云纱的色泽与纹理，收集传统纹样之美。",
+    cards: [
+      { id: "P01", name: "乌黑光泽", kind: "craft" },
+      { id: "P02", name: "龟裂纹理", kind: "craft" },
+      { id: "P03", name: "莨棕本色", kind: "craft" },
+      { id: "P04", name: "旗袍纹样", kind: "craft" }
+    ],
+    reward: { coins: 200, xp: 150, skin: "skin_silk" }
+  }
+];
+
+/* 图鉴卡片解锁条件：kind + id 对应的存档/行为判定（由 growth.js 实现） */
+var YS_CODEX_UNLOCK = {
+  master: { store: "mastersRead", hint: "在「传承人」页阅读该匠人的故事" },
+  know:   { store: "knowRead",     hint: "在「工艺知识」页读这条知识" },
+  point:  { store: "pointsDone",   hint: "到该点位实地打卡" },
+  craft:  { store: "patternsSeen", hint: "在「纹样图鉴」中点亮该纹样" }
+};
+
+/* ---------------------------------------------------------------- 研学季（赛季通行证）
+   以香云纱四时时令命名，每季 6 阶。传承轨（免费）与匠心轨（进阶，用传承币解锁）。
+   任务进度按累积「研习值 seasonXp」推进。 */
+var YS_SEASONS = [
+  {
+    id: "spring", name: "春染季", sub: "万物复苏 · 浸莨初染", icon: "🌱", color: "#667B55",
+    tiers: [
+      { need: 0,   free: { coins: 30,  xp: 20 },  pro: { coins: 60,  xp: 40,  skin: "skin_sprout" } },
+      { need: 100, free: { coins: 40,  xp: 30 },  pro: { coins: 80,  xp: 50 } },
+      { need: 250, free: { coins: 50,  xp: 40 },  pro: { coins: 100, xp: 60,  title: "ti_craftsman" } },
+      { need: 450, free: { coins: 60,  xp: 50 },  pro: { coins: 120, xp: 80,  frame: "fr_gold" } },
+      { need: 700, free: { coins: 80,  xp: 60 },  pro: { coins: 150, xp: 100, skin: "skin_spring" } },
+      { need: 1000,free: { coins: 120, xp: 100 }, pro: { coins: 220, xp: 150, title: "ti_master" } }
+    ]
+  },
+  {
+    id: "summer", name: "夏晒季", sub: "烈日当空 · 三蒸九晒", icon: "☀️", color: "#C98A2E",
+    tiers: [
+      { need: 0,   free: { coins: 30,  xp: 20 },  pro: { coins: 60,  xp: 40,  skin: "skin_sun" } },
+      { need: 120, free: { coins: 40,  xp: 30 },  pro: { coins: 80,  xp: 50 } },
+      { need: 300, free: { coins: 50,  xp: 40 },  pro: { coins: 100, xp: 60,  frame: "fr_red" } },
+      { need: 520, free: { coins: 60,  xp: 50 },  pro: { coins: 120, xp: 80,  title: "ti_master" } },
+      { need: 800, free: { coins: 80,  xp: 60 },  pro: { coins: 150, xp: 100, skin: "skin_sunset" } },
+      { need: 1200,free: { coins: 120, xp: 100 }, pro: { coins: 250, xp: 180, title: "ti_legend" } }
+    ]
+  },
+  {
+    id: "autumn", name: "秋织季", sub: "天高云淡 · 织造成纱", icon: "🍂", color: "#9E3B2F",
+    tiers: [
+      { need: 0,   free: { coins: 30,  xp: 20 },  pro: { coins: 60,  xp: 40,  skin: "skin_weave" } },
+      { need: 150, free: { coins: 40,  xp: 30 },  pro: { coins: 80,  xp: 50 } },
+      { need: 350, free: { coins: 50,  xp: 40 },  pro: { coins: 100, xp: 60,  frame: "fr_green" } },
+      { need: 600, free: { coins: 60,  xp: 50 },  pro: { coins: 120, xp: 80,  title: "ti_weaver" } },
+      { need: 900, free: { coins: 80,  xp: 60 },  pro: { coins: 150, xp: 100, skin: "skin_silk" } },
+      { need: 1300,free: { coins: 120, xp: 100 }, pro: { coins: 250, xp: 180, title: "ti_legend" } }
+    ]
+  },
+  {
+    id: "winter", name: "冬藏季", sub: "藏纱养韵 · 沉淀传承", icon: "❄️", color: "#4E6E8E",
+    tiers: [
+      { need: 0,   free: { coins: 30,  xp: 20 },  pro: { coins: 60,  xp: 40,  skin: "skin_frost" } },
+      { need: 180, free: { coins: 40,  xp: 30 },  pro: { coins: 80,  xp: 50 } },
+      { need: 400, free: { coins: 50,  xp: 40 },  pro: { coins: 100, xp: 60,  frame: "fr_rainbow" } },
+      { need: 650, free: { coins: 60,  xp: 50 },  pro: { coins: 120, xp: 80,  title: "ti_saint" } },
+      { need: 950, free: { coins: 80,  xp: 60 },  pro: { coins: 150, xp: 100, skin: "skin_ink" } },
+      { need: 1400,free: { coins: 120, xp: 100 }, pro: { coins: 300, xp: 200, title: "ti_immortal" } }
+    ]
+  }
+];
+var YS_SEASON_PRO_COST = 300; /* 解锁匠心轨所需传承币 */
+
+/* ---------------------------------------------------------------- 每日研习
+   每天刷新的小目标，全部用研学行为描述。 */
+var YS_DAILY = [
+  { id: "read",  name: "读一条工艺知识", icon: "📖", goal: 1, coins: 15, xp: 10, seasonXp: 20, act: "v-know" },
+  { id: "point", name: "探访一处点位",   icon: "📍", goal: 1, coins: 20, xp: 12, seasonXp: 25, act: "v-map" },
+  { id: "quiz",  name: "答一组研学题",   icon: "🧠", goal: 1, coins: 20, xp: 15, seasonXp: 30, act: "v-game" },
+  { id: "sign",  name: "完成每日晒莨签到", icon: "📅", goal: 1, coins: 10, xp: 8,  seasonXp: 15, act: "v-sign" }
+];
+
+/* 连续研习里程碑（晒莨历）：以晒莨工序隐喻坚持的天数 */
+var YS_STREAK_MILES = [
+  { days: 3,  name: "初浸薯莨", icon: "🌿", coins: 30,  xp: 20 },
+  { days: 7,  name: "一周之晒", icon: "☀️", coins: 60,  xp: 50, skin: "skin_sprout" },
+  { days: 14, name: "河泥初成", icon: "🟤", coins: 100, xp: 90, frame: "fr_gold" },
+  { days: 30, name: "成纱有期", icon: "🧶", coins: 200, xp: 180, skin: "skin_legend" }
+];
+
+/* ---------------------------------------------------------------- 限定皮肤
+   复用主题 skin，加稀有度/限定标签/解锁条件。仅在装扮页与图鉴展示。
+   skin 值对应 css 的 body[data-skin]，与已有主题一致，可直接穿戴。 */
+var YS_SKINS = [
+  { id: "skin_sprout", name: "新芽·青篁", skin: "grass",    rarity: 1, limited: false, desc: "初春染坊的青篁之色", from: "研学季·春染 / 连签 7 日" },
+  { id: "skin_sun",    name: "骄阳·晒金", skin: "gold",     rarity: 2, limited: false, desc: "盛夏晒场的鎏金光泽", from: "图鉴集齐·寻纱足迹 / 夏晒季" },
+  { id: "skin_sunset", name: "丹霞·薯莨", skin: "sunset",   rarity: 3, limited: true,  desc: "薯莨染就的赭红丹霞", from: "夏晒季·匠心轨限定" },
+  { id: "skin_weave",  name: "织云·青瓷", skin: "celadon",  rarity: 2, limited: false, desc: "织造车间的青瓷釉色", from: "图鉴集齐·匠心传承 / 秋织季" },
+  { id: "skin_silk",   name: "素纱·月光", skin: "sakura",   rarity: 2, limited: false, desc: "香云纱柔美的月色光泽", from: "图鉴集齐·纱品纹样" },
+  { id: "skin_mud",    name: "河泥·墨韵", skin: "ink",      rarity: 3, limited: true,  desc: "河泥媒染的深邃墨色", from: "图鉴集齐·工序密码限定" },
+  { id: "skin_frost",  name: "凝霜·远山", skin: "ocean",    rarity: 3, limited: true,  desc: "冬日远山的靛蓝霜色", from: "冬藏季·匠心轨限定" },
+  { id: "skin_spring", name: "春山·紫霞", skin: "violet",   rarity: 4, limited: true,  desc: "春日山岚流动的紫霞", from: "春染季·匠心轨终极" },
+  { id: "skin_ink",    name: "秘染·玄夜", skin: "ink",      rarity: 4, limited: true,  desc: "传说中的秘染玄色", from: "冬藏季·匠心轨终极" },
+  { id: "skin_legend", name: "宗师·流光", skin: "gold",     rarity: 5, limited: true,  desc: "仅属于非遗宗师的流光", from: "连续研习 30 日" }
+];
+var YS_RARITY = ["", "普通", "精良", "稀有", "史诗", "传说"];

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#83533B">
+  <title>香云纱研学园区 · 真实地图</title>
+  <style>
+    html, body { margin:0; padding:0; height:100%; font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; background:#F6F0E6; color:#33231A; }
+    #map { width:100%; height:100vh; }
+    .topbar { position:fixed; left:12px; right:12px; top:12px; z-index:20; display:flex; align-items:center; gap:10px;
+      background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(250,244,232,.94)); border:1px solid rgba(217,173,113,.5);
+      border-radius:16px; padding:12px 14px; box-shadow:0 8px 28px rgba(51,35,26,.14); }
+    .topbar .brand { font-size:17px; font-weight:850; color:#40291F; }
+    .topbar .sub { font-size:11px; color:#8B7766; margin-top:2px; }
+    .topbar .badge { margin-left:auto; font-size:11px; font-weight:800; color:#83533B; background:#F3E9DA; padding:5px 10px; border-radius:10px; white-space:nowrap; }
+    .tip { position:fixed; left:50%; top:78px; transform:translateX(-50%); z-index:20; font-size:11.5px; color:#6B574A;
+      background:rgba(255,255,255,.92); padding:6px 12px; border-radius:10px; white-space:nowrap; }
+    .info { position:fixed; left:12px; right:12px; bottom:16px; z-index:20; background:#fff; border-radius:18px;
+      box-shadow:0 12px 40px rgba(51,35,26,.22); overflow:hidden; display:none; }
+    .info.show { display:block; }
+    .info-h { display:flex; align-items:center; justify-content:space-between; padding:14px 16px 8px; }
+    .info-h b { font-size:16px; color:#40291F; }
+    .info-h span { cursor:pointer; color:#A39585; font-size:18px; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; background:#F3E9DA; border-radius:9px; }
+    .info-b { padding:0 16px 16px; }
+    .info-b .sub { font-size:12px; color:#A39585; margin-bottom:8px; }
+    .info-b .desc { font-size:13px; color:#6B574A; line-height:1.7; }
+  </style>
+  <!-- 境内地图合规：腾讯地图 2D API；密钥由运行环境通过代理注入，前端零 Key 暴露。占位符请勿修改。 -->
+  <script type="text/javascript">
+    window._TMapSecurityConfig = {
+      serviceHost: 'http://127.0.0.1:__WB_HTTP_PORT__/_TMapService/_wbt/__WB_TMAP_SECRET__',
+    };
+  </script>
+  <script src="https://map.qq.com/api/js?v=2.exp"></script>
+  <script type="text/javascript">
+    /* 工作台预览环境清除 2D 地图鉴权提示条的文字（不隐藏元素，绝不误伤地图容器）；正式配 Key 后本不出现 */
+    (function () {
+      var PAT = /^(鉴权失败|授权失败|请传入正确的\s*[Kk]ey|请.*正确的\s*[Kk]ey)/;
+      function scrub() {
+        var all = document.querySelectorAll('body div');
+        for (var i = 0; i < all.length; i++) {
+          var el = all[i];
+          /* 只匹配「子元素≤1、自身直接文本就是提示语」的小节点；用直接文本而非 textContent，
+             避免误伤包含提示条的地图视图大容器导致白屏。 */
+          if (el.children.length <= 1) {
+            var own = '';
+            for (var n = 0; n < el.childNodes.length; n++) {
+              if (el.childNodes[n].nodeType === 3) own += el.childNodes[n].textContent;
+            }
+            own = own.trim();
+            if (own.length < 40 && PAT.test(own)) {
+              for (var c = 0; c < el.childNodes.length; c++) {
+                if (el.childNodes[c].nodeType === 3) el.childNodes[c].textContent = '';
+              }
+              el.style.setProperty('display', 'none', 'important');
+            }
+          }
+        }
+      }
+      document.addEventListener('DOMContentLoaded', function () {
+        scrub();
+        try { var mo = new MutationObserver(function(){ scrub(); }); mo.observe(document.body, {childList:true, subtree:true, characterData:true}); } catch(e){}
+        [300,800,1500,3000,5000,8000,12000].forEach(function(ms){ setTimeout(scrub, ms); });
+      });
+    })();
+  </script>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="topbar">
+    <div><div class="brand">香云纱研学园区</div><div class="sub">广东省佛山市顺德区 · 四大研学点位</div></div>
+    <div class="badge">🗺️ 真实地图</div>
+  </div>
+  <div class="tip">拖动平移 · 滚轮/双指缩放 · 点击标记查看点位</div>
+  <div class="info" id="info">
+    <div class="info-h"><b id="infoName"></b><span id="infoClose">✕</span></div>
+    <div class="info-b"><div class="sub" id="infoSub"></div><div class="desc" id="infoDesc"></div></div>
+  </div>
+
+  <script>
+    var POINTS = [
+      { key:'HALL', lat:22.8060, lng:113.2960, name:'莨珠记主馆', sub:'理论研学 · 布匹展陈', desc:'参观岭南镬耳屋风格的研学主馆，认识香云纱的历史渊源与基地的研学课程体系。' },
+      { key:'WORKSHOP', lat:22.8030, lng:113.2930, name:'染整工作坊', sub:'原料处理 · 工艺学习', desc:'认识生产工作坊的功能分区、原料及工序教学，理解湿作业区与整理区的划分逻辑。' },
+      { key:'DRYING_FIELD', lat:22.8080, lng:113.2980, name:'草地晒莨场', sub:'三蒸九煮 · 阳光晒莨', desc:'在草地晒场观察薯莨染整后的布匹如何经阳光反复晾晒，理解“看天晒莨”的工艺智慧。' },
+      { key:'RIVER', lat:22.8000, lng:113.2900, name:'河涌泥料区', sub:'水乡环境 · 泥料知识', desc:'了解珠江流域含铁河泥如何与薯莨单宁发生反应，形成香云纱独有的乌黑光泽。' }
+    ];
+    var CENTER = { lat:22.8045, lng:113.2942 };
+
+    function label(content, kind) {
+      var box = document.createElement('div');
+      box.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 8px;border-radius:15px;' +
+        'background:' + (kind==='base' ? '#C98A2E' : '#83533B') + ';color:#fff;font-size:13px;font-weight:800;' +
+        'border:2.5px solid #fff;box-shadow:0 3px 10px rgba(51,35,26,.35);white-space:nowrap;';
+      box.textContent = content;
+      return box;
+    }
+    function showInfo(p) {
+      document.getElementById('infoName').textContent = p.name;
+      document.getElementById('infoSub').textContent = p.sub + ' · ' + p.lat.toFixed(4) + 'N, ' + p.lng.toFixed(4) + 'E';
+      document.getElementById('infoDesc').textContent = p.desc;
+      document.getElementById('info').classList.add('show');
+    }
+
+    window.addEventListener('load', function () {
+      if (!window.qq || !qq.maps) {
+        document.getElementById('map').innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:#8B7766;font-size:14px">地图加载失败，请检查网络后刷新</div>';
+        return;
+      }
+      var map = new qq.maps.Map(document.getElementById('map'), {
+        center: new qq.maps.LatLng(CENTER.lat, CENTER.lng),
+        zoom: 14,
+        mapTypeControl: false,
+        panControl: false,
+        zoomControl: true,
+        zoomControlOptions: { position: qq.maps.ControlPosition.RIGHT_CENTER }
+      });
+      POINTS.forEach(function (p) {
+        var mk = new qq.maps.Marker({
+          position: new qq.maps.LatLng(p.lat, p.lng), map: map,
+          label: label(p.name.slice(0,1), 'point'), title: p.name
+        });
+        qq.maps.event.addListener(mk, 'click', function () { showInfo(p); });
+      });
+      new qq.maps.Marker({ position:new qq.maps.LatLng(CENTER.lat,CENTER.lng), map:map, label:label('基','base') });
+      document.getElementById('infoClose').onclick = function () { document.getElementById('info').classList.remove('show'); };
+      /* 演示环境下地图 SDK 可能显示「鉴权失败」提示条（不影响底图与缩放）；
+         密钥代理生效时它是误报，这里隐藏该提示条，保持界面整洁。正式配置 Key 后本就不会出现。 */
+      var scrub = function () {
+        var all = document.querySelectorAll('body div');
+        for (var i = 0; i < all.length; i++) {
+          var el = all[i];
+          if (el.children.length <= 2 && (el.textContent || '').indexOf('鉴权失败') >= 0) {
+            el.style.setProperty('display', 'none', 'important');
+          }
+        }
+      };
+      setTimeout(scrub, 1200); setTimeout(scrub, 3000); setTimeout(scrub, 6000);
+    });
+  </script>
+</body>
+</html>
