@@ -31,7 +31,7 @@
             };
         </script>
         <!-- SDK 必须静态引入：运行环境只对 HTML 里的静态 script 注入密钥代理，动态创建的 script 拿不到代理 -->
-        <script src="https://map.qq.com/api/js?v=2.exp"></script>
+        <script src="https://map.qq.com/api/js?v=2.exp" async></script>
         <script type="text/javascript">
             /* 工作台预览环境：2D 地图 SDK 不认代理密钥，会插入「鉴权失败/请传入正确的key」提示条，
                但底图瓦片与缩放平移都正常。这里只清除该提示条的文字（不隐藏元素、不影响容器），
@@ -378,25 +378,24 @@
             </div>
         </div>
 
-        <script src="js/config.js"></script>
-        <script src="js/data.js"></script>
-        <script src="js/icons3d.js"></script>
-        <script src="js/api.js"></script>
-        <script src="js/app.js"></script>
-        <script src="js/tour.js"></script>
-        <script src="js/views.js"></script>
-        <script src="js/game.js"></script>
-        <script src="js/map3d.js"></script>
-        <script src="js/realmap.js"></script>
-        <script src="js/growth.js"></script>
-        <script src="js/reward.js"></script>
-        <script src="js/encyclopedia.js"></script>
-        <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
-        <script src="js/realtime.js"></script>
-        <script src="js/fx.js"></script>
-        <script src="js/home3d.js"></script>
-        <script src="js/lib/jsQR.js"></script>
-        <script src="js/scan.js"></script>
+        <script src="js/config.js" defer></script>
+        <script src="js/data.js" defer></script>
+        <script src="js/icons3d.js" defer></script>
+        <script src="js/api.js" defer></script>
+        <script src="js/app.js" defer></script>
+        <script src="js/tour.js" defer></script>
+        <script src="js/views.js" defer></script>
+        <script src="js/game.js" defer></script>
+        <script src="js/map3d.js" defer></script>
+        <script src="js/realmap.js" defer></script>
+        <script src="js/growth.js" defer></script>
+        <script src="js/reward.js" defer></script>
+        <script src="js/encyclopedia.js" defer></script>
+        <script src="assets/vendor/three.min.js" defer></script>
+        <script src="js/realtime.js" defer></script>
+        <script src="js/fx.js" defer></script>
+        <script src="js/home3d.js" defer></script>
+        <script src="js/scan.js" defer></script>
         <script>
             /* 成就关闭按钮 */
             (function() {

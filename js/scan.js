@@ -19,8 +19,24 @@
   var overlay = null, video = null, canvas = null, cctx = null, fileInput = null;
   var acanvas = null, actx = null;
   var stream = null, raf = 0, running = false, lastText = "";
+  var jsQrPromise = null;
 
   function $(sel, root) { return (root || document).querySelector(sel); }
+
+  /* jsQR 体积较大（约 250KB），首屏不加载；打开扫码面板时才按需拉取 */
+  function ensureJsQR() {
+    if (global.jsQR) return Promise.resolve();
+    if (jsQrPromise) return jsQrPromise;
+    jsQrPromise = new Promise(function (res, rej) {
+      var s = document.createElement("script");
+      s.src = "js/lib/jsQR.js";
+      s.async = true;
+      s.onload = function () { res(); };
+      s.onerror = function () { jsQrPromise = null; rej(new Error("jsQR load failed")); };
+      document.head.appendChild(s);
+    });
+    return jsQrPromise;
+  }
 
   function ensureDom() {
     if (overlay) return;
@@ -84,7 +100,8 @@
     overlay.classList.add("show");
     document.body.style.overflow = "hidden";
     lastText = "";
-    startCamera();
+    setStatus("正在准备扫码…");
+    ensureJsQR().then(startCamera).catch(function () { onCamError(); });
   }
 
   function close() {
@@ -154,9 +171,11 @@
         acanvas.width = img.width; acanvas.height = img.height;
         actx.drawImage(img, 0, 0);
         var d = actx.getImageData(0, 0, img.width, img.height);
-        var res = decode(d.data, img.width, img.height);
-        if (res) handleResult(res);
-        else setStatus("未能从图片中识别二维码，请换一张清晰的二维码图片");
+        ensureJsQR().then(function () {
+          var res = decode(d.data, img.width, img.height);
+          if (res) handleResult(res);
+          else setStatus("未能从图片中识别二维码，请换一张清晰的二维码图片");
+        }).catch(function () { setStatus("识别库加载失败，请重试"); });
       };
       img.onerror = function () { setStatus("图片加载失败，请重试"); };
       img.src = fr.result;

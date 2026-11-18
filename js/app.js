@@ -488,6 +488,31 @@ function renderStatus() {
 /* ---------------------------------------------------------------- 启动 */
 var App = { booted: false };
 
+/* 进入函数在脚本加载后立即绑定，不等后端探测、不等 three，保证封面按钮随时可点 */
+window.startFromSplash = function() {
+  var splash = $("#splash");
+  if (splash) {
+    splash.classList.add("hide");
+    setTimeout(function(){ if (splash) splash.remove(); }, 700);
+  }
+  var aw = $("#authWrap");
+  if (aw) aw.classList.add("hide");
+  try {
+    var loggedIn = !!(Store.data && Store.data.loggedIn);
+    if (!loggedIn) {
+      showAuth();
+    } else {
+      if (!Store.data.guideDone) openGuide();
+      else if (Store.data.user && Store.data.user.role === "teacher") Nav.go("v-teacher", { push: false });
+      else Nav.go("v-home", { push: false });
+      unlockAchievement("first_login");
+    }
+  } catch (e) {
+    console.warn("start view", e);
+    try { Nav.go("v-home", { push: false }); } catch (_) {}
+  }
+};
+
 async function boot() {
   // 关键：先绑定全局事件，确保后续任何异常都不会让页面"点不动"
   Store.load();
@@ -516,36 +541,6 @@ async function boot() {
   if (bar) bar.style.width = "100%";
   await sleep(220);
   App.booted = true;
-
-  // 【核心改动】把进入的逻辑包成一个函数，点击按钮时执行
-  window.startFromSplash = function() {
-      var splash = $("#splash");
-      if (splash) {
-          splash.classList.add("hide");
-          setTimeout(function(){ if (splash) splash.remove(); }, 700);
-      }
-
-      // 进入主程序前，确保登录卡片已隐藏（已登录用户重进 / 跨页残留时，
-      // #authWrap 默认可见会盖住首页；未登录分支随后由 showAuth() 重新显示）
-      var aw = $("#authWrap");
-      if (aw) aw.classList.add("hide");
-
-      // 判断进入登录页还是首页
-      try {
-        if (!Store.data.loggedIn) {
-          // 未登录：先进入登录页；「初入云纱」在登录成功后的 reallyLogin 里按用户档案解锁，避免重复弹窗
-          showAuth();
-        } else {
-          if (!Store.data.guideDone) openGuide();
-          else if (Store.data.user.role === "teacher") Nav.go("v-teacher", { push: false });
-          else Nav.go("v-home", { push: false });
-          unlockAchievement("first_login");
-        }
-      } catch (e) {
-        console.warn("boot view", e);
-        Nav.go("v-home", { push: false });
-      }
-  };
 }
 
 /* ---------------------------------------------------------------- 登录页 */
