@@ -20,6 +20,22 @@ var RealMap = {
   }
 };
 
+/* three.js 体积约 633KB，首屏不加载；进入 3D 地图时才按需拉取，Promise 缓存避免重复请求 */
+var threePromise = null;
+function ensureThree() {
+  if (typeof THREE !== "undefined") return Promise.resolve();
+  if (threePromise) return threePromise;
+  threePromise = new Promise(function (res, rej) {
+    var s = document.createElement("script");
+    s.src = "assets/vendor/three.min.js";
+    s.async = true;
+    s.onload = function () { res(); };
+    s.onerror = function () { threePromise = null; rej(new Error("three load failed")); };
+    document.head.appendChild(s);
+  });
+  return threePromise;
+}
+
 /* ---------------------------------------------------------------- 3D 园区场景 */
 var Map3D = {
   scene: null, camera: null, renderer: null,
@@ -46,13 +62,15 @@ var Map3D = {
     }});
   },
 
-  build: function () {
+  build: async function () {
     var container = $("#map3dCanvas");
+    try { await ensureThree(); } catch (e) { /* 落到下方守卫提示 */ }
     if (!container || typeof THREE === "undefined") {
-      container.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--ink-2)">' +
+      var msg = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--ink-2)">' +
         '<div style="font-size:40px;margin-bottom:10px">🏗️</div>' +
         '<div>3D 引擎加载失败</div>' +
         '<div style="font-size:12px;color:var(--ink-3);margin-top:6px">请检查网络后重试，或使用数字孪生完整场景</div></div>';
+      if (container) container.innerHTML = msg;
       return;
     }
 
