@@ -81,7 +81,7 @@ var API = {
       var b = candidates[i];
       self.base = b;
       self.wsBase = self._deriveWsBase(b);
-      return self.fetch("/api/health", { timeout: 1200 })
+      return self.fetch("/api/health", { timeout: 3500 })
         .then(function (r) {
           self.online = true;
           self.llmEnabled = !!r.llm_enabled;

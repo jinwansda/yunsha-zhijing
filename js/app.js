@@ -541,6 +541,10 @@ async function boot() {
   if (bar) bar.style.width = "100%";
   await sleep(220);
   App.booted = true;
+  try {
+    var fb = document.getElementById("bootFallback");
+    if (fb) fb.style.display = "none";
+  } catch (e) {}
 }
 
 /* ---------------------------------------------------------------- 登录页 */

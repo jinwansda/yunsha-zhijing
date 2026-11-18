@@ -418,7 +418,8 @@
                 document.head.appendChild(css);
             })();
 
-            /* 老内核兜底 */
+            /* 老内核兜底：冷启动/弱网下 boot 可能超过数秒，这里轮询判断，
+               一旦 App.booted 立即隐藏；只有页面加载完成后仍未启动才提示。 */
             (function() {
                 var oldEngine = false;
                 try {
@@ -426,13 +427,21 @@
                 } catch (e) {
                     oldEngine = true;
                 }
-                setTimeout(function() {
+                var ticks = 0;
+                var timer = setInterval(function() {
+                    ticks++;
                     var box = document.getElementById("bootFallback");
-                    if (!box) return;
-                    var ok = window.App && window.App.booted;
-                    if (ok && !oldEngine) return;
-                    box.style.display = "flex";
-                }, 6000);
+                    if (!box) { clearInterval(timer); return; }
+                    if (window.App && window.App.booted) {
+                        box.style.display = "none";
+                        clearInterval(timer);
+                        return;
+                    }
+                    // 页面加载完成后仍未启动（最多宽限 20 秒）才提示
+                    if (document.readyState === "complete" && ticks >= 20) {
+                        box.style.display = "flex";
+                    }
+                }, 1000);
             })();
         </script>
     </body>
