@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+        <meta name="theme-color" content="#83533B">
+        <meta name="description" content="莨珠记·云纱智境 —— 香云纱非遗数字研学平台：非遗传承 · 数字体验 · 工匠育人">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-title" content="云纱智境">
+        <meta name="format-detection" content="telephone=no">
+        <title>莨珠记 · 云纱智境</title>
+        <link rel="stylesheet" href="css/app.css">
+        <link rel="stylesheet" href="css/views.css">
+        <link rel="stylesheet" href="css/theme3d.css">
+        <link rel="preconnect" href="https://miaoda.feishu.cn">
+        <link href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@400;600;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+        <style>
+            @media (min-width:640px) {
+                .statusbar {
+                    padding-top: 44px;
+                }
+            }
+        </style>
+    </head>
+    <body data-theme="light">
+        <div class="app" id="app">
+            <div class="app-bg">
+                <div class="bg-photo" style="background-image:url(assets/real/real_02.jpg)"></div>
+                <div class="bg-photo" style="background-image:url(assets/real/real_10.jpg)"></div>
+                <div class="bg-photo" style="background-image:url(assets/real/real_39.jpg)"></div>
+                <div class="bg-photo" style="background-image:url(assets/real/real_43.jpg)"></div>
+                <div class="bg-veil"></div>
+            </div>
+
+            <div class="main">
+                <!-- 状态栏 -->
+                <div class="statusbar">
+                    <span class="sb-left"><i class="sb-dot"></i>云纱智境 · 莨珠记　<span id="wsBadge"
+                            style="font-size:10px;font-weight:600"><i
+                                style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ink-3);margin-right:4px;vertical-align:middle"></i>离线</span></span>
+                    <span class="sb-right">
+                        <span class="coins" title="传承币 / 积分"><span class="sb-3d" data-icon="coin"></span> <b
+                                id="sbCoins">0 / 0</b></span>
+                        <span id="sbStreak"><span class="sb-3d" data-icon="flame"></span> <b id="sbStreakN">0</b></span>
+                    </span>
+                </div>
+
+                <div class="viewport" id="viewport">
+                    <!-- ==================== 首页 ==================== -->
+                    <section class="view active" id="v-home">
+                        <div id="homeBody"></div>
+                    </section>
+
+                    <!-- ==================== 研学地图 ==================== -->
+                    <section class="view" id="v-map">
+                        <div id="mapBody"></div>
+                    </section>
+
+                    <!-- ==================== 研学任务 ==================== -->
+                    <section class="view" id="v-task">
+                        <div id="taskBody"></div>
+                    </section>
+
+                    <!-- ==================== 工艺知识 ==================== -->
+                    <section class="view" id="v-know">
+                        <div id="knowBody"></div>
+                    </section>
+
+                    <!-- ==================== 我的学习 ==================== -->
+                    <section class="view" id="v-me">
+                        <div id="meBody"></div>
+                    </section>
+
+                    <!-- ==================== 二级页面 ==================== -->
+                    <section class="view" id="v-point">
+                        <div id="pointBody"></div>
+                    </section>
+                    <section class="view" id="v-know-detail">
+                        <div id="knowDetailBody"></div>
+                    </section>
+                    <section class="view" id="v-ai">
+                        <div id="aiBody"></div>
+                    </section>
+                    <section class="view" id="v-report">
+                        <div id="reportBody"></div>
+                    </section>
+                    <section class="view" id="v-overview">
+                        <div id="overviewBody"></div>
+                    </section>
+                    <section class="view" id="v-route">
+                        <div id="routeBody"></div>
+                    </section>
+                    <section class="view" id="v-cert">
+                        <div id="certBody"></div>
+                    </section>
+                    <section class="view" id="v-settings">
+                        <div id="settingsBody"></div>
+                    </section>
+                    <section class="view" id="v-ue">
+                        <div id="ueBody"></div>
+                    </section>
+                    <section class="view" id="v-game">
+                        <div id="gameBody"></div>
+                    </section>
+                    <section class="view" id="v-stories">
+                        <div id="storiesBody"></div>
+                    </section>
+                    <section class="view" id="v-story-detail">
+                        <div id="storyDetailBody"></div>
+                    </section>
+                    <section class="view" id="v-masters">
+                        <div id="mastersBody"></div>
+                    </section>
+                    <section class="view" id="v-master-detail">
+                        <div id="masterDetailBody"></div>
+                    </section>
+                    <section class="view" id="v-teacher">
+                        <div id="teacherBody"></div>
+                    </section>
+                    <section class="view" id="v-map3d">
+                        <div id="map3dBody"></div>
+                    </section>
+                    <section class="view" id="v-shop">
+                        <div id="shopBody"></div>
+                    </section>
+                    <section class="view" id="v-box">
+                        <div id="boxBody"></div>
+                    </section>
+                    <section class="view" id="v-sign">
+                        <div id="signBody"></div>
+                    </section>
+                    <section class="view" id="v-avatar">
+                        <div id="avatarBody"></div>
+                    </section>
+                    <section class="view" id="v-frame">
+                        <div id="frameBody"></div>
+                    </section>
+                    <section class="view" id="v-title">
+                        <div id="titleBody"></div>
+                    </section>
+                    <section class="view" id="v-inventory">
+                        <div id="inventoryBody"></div>
+                    </section>
+                    <section class="view" id="v-share">
+                        <div id="shareBody"></div>
+                    </section>
+                    <section class="view" id="v-encyc">
+                        <div id="encycBody"></div>
+                    </section>
+                    <section class="view" id="v-encyc-detail">
+                        <div id="encycDetailBody"></div>
+                    </section>
+                    <section class="view" id="v-timeline">
+                        <div id="timelineBody"></div>
+                    </section>
+                </div>
+
+                <!-- ==================== 底部导航 ==================== -->
+                <nav class="tabbar" id="tabbar"
+                    style="position:relative;z-index:100;display:flex;background:var(--card);border-top:1px solid var(--line-2);padding:8px 0 calc(8px + var(--sab));flex-shrink:0">
+                    <button class="tab on" data-nav="v-home"
+                        style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-3);font-size:11px">
+                        <span class="tab-ico" data-icon="home"
+                            style="width:26px;height:26px;display:inline-flex"></span><span>首页</span>
+                    </button>
+                    <button class="tab" data-nav="v-map"
+                        style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-3);font-size:11px">
+                        <span class="tab-ico" data-icon="map"
+                            style="width:26px;height:26px;display:inline-flex"></span><span>地图</span>
+                    </button>
+                    <button class="tab" data-nav="v-task"
+                        style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-3);font-size:11px">
+                        <span class="tab-ico" data-icon="task"
+                            style="width:26px;height:26px;display:inline-flex"></span><span>任务</span>
+                    </button>
+                    <button class="tab" data-nav="v-know"
+                        style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-3);font-size:11px">
+                        <span class="tab-ico" data-icon="know"
+                            style="width:26px;height:26px;display:inline-flex"></span><span>知识</span>
+                    </button>
+                    <button class="tab" data-nav="v-me"
+                        style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-3);font-size:11px">
+                        <span class="tab-ico" data-icon="me"
+                            style="width:26px;height:26px;display:inline-flex"></span><span>我的</span>
+                    </button>
+                </nav>
+            </div>
+
+
+           		<!-- ==================== 启动页 ==================== -->
+           		<div class="splash" id="splash">
+           			<!-- 第一层：山水背景 -->
+           			<div class="bg-mountain" style="background: linear-gradient(180deg, rgba(255,248,236,0.34) 0%, rgba(255,250,240,0.14) 45%, rgba(255,244,228,0.66) 100%), url('assets/mountain-bg.jpg') center center / cover no-repeat !important;"></div>
+           
+           			<!-- 第二、三、四层：飘动的云雾（装饰） -->
+           			<div class="cloud cloud-1"></div>
+           			<div class="cloud cloud-2"></div>
+           			<div class="cloud cloud-3"></div>
+           
+           			<!-- 第五层：所有可见内容 -->
+           			<div class="content">
+           				<!-- 顶部小字 -->
+           				<div class="top-subtitle">云 纱 幻 境</div>
+           				<!-- 中间大标题区 -->
+           				<div class="main-title-area">
+           					<div class="side-note">寻一方秘境  遇千年云纱</div>
+           					<h1 class="main-title">云纱幻境</h1>
+           					<div class="seal">入境</div>
+           				</div>
+           				<!-- 底部按钮区 -->
+           				<div class="bottom-area">
+           					<button class="login-btn" onclick="startFromSplash()">登 录 即 入</button>
+           					<div class="bottom-label">① 启动页 · 品牌视觉与加载</div>
+           				</div>
+           			</div>
+           		</div>
+
+            <!-- ==================== 登录页 ==================== -->
+            <div class="auth-wrap" id="authWrap">
+                <div class="auth-brand">
+                    <span class="seal">纱</span>
+                    <h1>云纱智境</h1>
+                    <p>非遗传承 · 数字体验 · 工匠育人</p>
+                </div>
+                <div class="auth-card">
+                    <h2>开始寻纱之旅</h2>
+                    <div class="hint">填写你的信息，进入香云纱的染整世界</div>
+                    <div class="field">
+                        <label>手机号</label>
+                        <input id="authPhone" type="tel" maxlength="11" inputmode="numeric" placeholder="请输入 11 位手机号" />
+                    </div>
+                    <button class="btn btn-ghost btn-block" id="authSendCode" type="button">获取验证码</button>
+                    <div class="field">
+                        <label>验证码</label>
+                        <input id="authCode" type="tel" maxlength="6" inputmode="numeric" placeholder="请输入 6 位验证码" />
+                    </div>
+                    <button class="btn btn-primary btn-block" id="authLoginBtn">进入研学平台</button>
+                    <div id="authAccounts"></div>
+                    <div style="text-align:center;font-size:11px;color:var(--ink-3);margin-top:14px">非遗传承 · 数字体验 · 工匠育人
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== 引导页 ==================== -->
+            <div class="gate hide" id="gate">
+                <div class="intro-track" id="introTrack">
+                    <div class="intro-slide">
+                        <div class="intro-art">
+                            <div class="ring"></div>
+                            <div class="ring"></div>
+                            <div class="intro-emoji">🧵</div>
+                        </div>
+                        <h2>走进<em>香云纱</em><br>感受岭南匠心</h2>
+                        <p>香云纱是国家级非物质文化遗产，以蚕丝为底、薯莨浸染、河泥媒染，被誉为「一两黄金一两纱」。</p>
+                    </div>
+                    <div class="intro-slide">
+                        <div class="intro-art">
+                            <div class="ring"></div>
+                            <div class="ring"></div>
+                            <div class="intro-emoji">🗺️</div>
+                        </div>
+                        <h2>四大点位<em>虚实结合</em><br>沉浸式研学</h2>
+                        <p>主馆、工坊、晒场、河涌，配合 UE 虚拟引擎的数字孪生场景，足不出户也能身临其境。</p>
+                    </div>
+                    <div class="intro-slide">
+                        <div class="intro-art">
+                            <div class="ring"></div>
+                            <div class="ring"></div>
+                            <div class="intro-emoji">🏆</div>
+                        </div>
+                        <h2>闯关答题<em>赢积分</em><br>解锁成就证书</h2>
+                        <p>完成研学任务、参与小游戏、每日签到，积累积分、解锁成就，生成属于你的研学证书。</p>
+                    </div>
+                </div>
+                <div class="intro-foot">
+                    <button class="btn btn-ghost btn-sm" id="introSkip">跳过</button>
+                    <div class="intro-dots" id="introDots"><i class="on"></i><i></i><i></i></div>
+                    <button class="btn btn-primary btn-sm" id="introNext">继续</button>
+                </div>
+            </div>
+
+            <!-- ==================== 通用弹层 ==================== -->
+            <div class="sheet-mask" id="sheetMask"></div>
+            <div class="sheet" id="sheet">
+                <div class="sheet-grip"></div>
+                <div class="sheet-head">
+                    <h3 id="sheetTitle">标题</h3>
+                    <button class="icon-btn" id="sheetClose">✕</button>
+                </div>
+                <div class="sheet-body" id="sheetBody"></div>
+                <div class="sheet-foot" id="sheetFoot" style="display:none"></div>
+            </div>
+
+            <div class="toast-wrap" id="toastWrap"></div>
+
+            <!-- ==================== 游戏全屏层 ==================== -->
+            <div class="game-mask" id="gameMask">
+                <div class="game-stage" id="gameStage"></div>
+            </div>
+
+            <!-- ==================== 成就解锁 ==================== -->
+            <div class="unlock-mask" id="unlockMask">
+                <div class="unlock-box">
+                    <div class="unlock-ico" id="unlockIco">🏅</div>
+                    <div class="unlock-tag">ACHIEVEMENT UNLOCKED</div>
+                    <div class="unlock-name" id="unlockName">成就解锁</div>
+                    <div class="unlock-desc" id="unlockDesc">描述</div>
+                    <button class="unlock-btn" id="unlockClose">收下</button>
+                </div>
+            </div>
+
+            <div class="confetti-layer" id="confettiLayer"></div>
+        </div>
+
+        <!-- 启动失败兜底 -->
+        <div class="boot-fallback" id="bootFallback">
+            <div class="bf-box">
+                <div class="bf-emoji">⚠️</div>
+                <b>页面没有正常启动</b>
+                <p>可能是浏览器内核版本过旧，或本地资源没有加载完整。</p>
+                <button class="btn btn-primary" onclick="location.reload()">重新加载</button>
+            </div>
+        </div>
+
+        <script src="js/config.js"></script>
+        <script src="js/data.js"></script>
+        <script src="js/icons3d.js"></script>
+        <script src="js/api.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/views.js"></script>
+        <script src="js/game.js"></script>
+        <script src="js/map3d.js"></script>
+        <script src="js/reward.js"></script>
+        <script src="js/encyclopedia.js"></script>
+        <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+        <script src="js/realtime.js"></script>
+        <script src="js/fx.js"></script>
+        <script src="js/home3d.js"></script>
+        <script src="js/lib/jsQR.js"></script>
+        <script src="js/scan.js"></script>
+        <script>
+            /* 成就关闭按钮 */
+            (function() {
+                document.addEventListener("DOMContentLoaded", function() {
+                    var btn = document.getElementById("unlockClose");
+                    if (btn) btn.addEventListener("click", function() {
+                        document.getElementById("unlockMask").classList.remove("show");
+                    });
+                });
+            })();
+
+            /* 底部导航高亮样式补充 */
+            (function() {
+                var css = document.createElement("style");
+                css.textContent =
+                    "#tabbar .tab{background:none;border:none;transition:color .2s}" +
+                    "#tabbar .tab.on{color:var(--brand-d) !important}" +
+                    "#tabbar .tab.on span:first-child{transform:scale(1.15)}" +
+                    "#tabbar .tab span:first-child{transition:transform .2s var(--ease)}";
+                document.head.appendChild(css);
+            })();
+
+            /* 老内核兜底 */
+            (function() {
+                var oldEngine = false;
+                try {
+                    new Function("return (async function(){})")();
+                } catch (e) {
+                    oldEngine = true;
+                }
+                setTimeout(function() {
+                    var box = document.getElementById("bootFallback");
+                    if (!box) return;
+                    var ok = window.App && window.App.booted;
+                    if (ok && !oldEngine) return;
+                    box.style.display = "flex";
+                }, 6000);
+            })();
+        </script>
+    </body>
+</html>

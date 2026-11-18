@@ -1,0 +1,58 @@
+{
+    "id": "com.yunsha.langzhuji",
+    "name": "莨珠记·云纱智境",
+    "version": {
+        "name": "1.2.0",
+        "code": "120"
+    },
+    "description": "香云纱非遗数字研学平台 · 非遗传承 · 数字体验 · 工匠育人",
+    "launch_path": "index.html",
+    "icons": {
+        "72": "assets/icon-72.png",
+        "96": "assets/icon-96.png",
+        "120": "assets/icon-120.png",
+        "144": "assets/icon-144.png",
+        "180": "assets/icon-180.png"
+    },
+    "developer": {
+        "name": "云纱智境竞赛小组"
+    },
+    "permissions": {
+        "Barcode": {
+            "description": "扫码进入研学点位，解锁点位任务"
+        },
+        "Vibration": {
+            "description": "答题与签到时的震动反馈"
+        },
+        "Camera": {
+            "description": "扫描园区二维码"
+        },
+        "Audio": {
+            "description": "游戏音效与语音提示"
+        }
+    },
+    "plus": {
+        "splashscreen": {
+            "autoclose": true,
+            "waiting": true,
+            "delay": 0
+        },
+        "statusbar": {
+            "immersed": true,
+            "style": "light"
+        },
+        "screenOrientation": [
+            "portrait-primary"
+        ],
+        "distribute": {
+            "android": {
+                "permissions": [
+                    "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CAMERA\"/>",
+                    "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>"
+                ]
+            }
+        }
+    }
+}
